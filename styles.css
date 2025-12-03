@@ -1523,10 +1523,6 @@ footer a:hover {
     footer {
         margin-bottom: 20px;
     }
-
-    .main-nav {
-        display: none;
-    }
 }
 
 /* ========== MAIN NAVIGATION ========== */
@@ -1541,6 +1537,12 @@ footer a:hover {
     background-color: var(--section-bg);
     padding: 8px 16px;
     border: 2px solid var(--dusty-rose);
+}
+
+@media (max-width: 768px) {
+    .main-nav {
+        display: none;
+    }
 }
 
 .nav-link {
