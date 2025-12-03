@@ -1,1 +1,16 @@
+# Claude Code
+CLAUDE.md
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local development
+.env
+.env.local
