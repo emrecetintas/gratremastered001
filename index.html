@@ -14,174 +14,512 @@
     <div class="grain-overlay"></div>
     <div class="ancient-pattern"></div>
 
-    <div class="container">
-        <div class="header">
-            <div class="logo">Gratified</div>
-            <div class="tagline">coffee + art</div>
+    <!-- Main Navigation -->
+    <nav class="main-nav" id="mainNav">
+        <a href="#landing" class="nav-link active" data-page="landing">Home</a>
+        <a href="#about" class="nav-link" data-page="about">About</a>
+        <a href="#subscribe" class="nav-link" data-page="subscribe">Subscribe</a>
+        <a href="#partnerships" class="nav-link" data-page="partnerships">Partner</a>
+        <a href="#buttercup" class="nav-link" data-page="buttercup">Buttercup</a>
+    </nav>
 
-            <!-- Theme Toggle Button -->
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                <span class="theme-toggle-icon sun">&#9788;</span>
-                <span class="theme-toggle-icon moon">&#9790;</span>
-            </button>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <span class="theme-toggle-icon sun">&#9788;</span>
+        <span class="theme-toggle-icon moon">&#9790;</span>
+    </button>
+
+    <!-- Page Container -->
+    <div class="pages-container" id="pagesContainer">
+
+        <!-- ========== LANDING PAGE ========== -->
+        <div class="page active" id="page-landing" data-page="landing">
+            <div class="container landing-container">
+                <div class="landing-hero">
+                    <div class="logo landing-logo">Gratified</div>
+                    <div class="tagline landing-tagline">coffee + art</div>
+                    <p class="landing-intro">A traveling coffee popup bringing warmth, creativity, and community to every corner.</p>
+                    <div class="landing-cta">
+                        <button class="cta-btn primary" onclick="navigateTo('about')">Explore Menu</button>
+                        <button class="cta-btn secondary" onclick="navigateTo('subscribe')">Subscribe</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="content">
-            <div class="section" id="menu">
-                <canvas id="liquid-canvas"></canvas>
-                <h2 class="section-title">Menu</h2>
+        <!-- ========== ABOUT/MENU PAGE ========== -->
+        <div class="page" id="page-about" data-page="about">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">Gratified</div>
+                    <div class="tagline">coffee + art</div>
+                </div>
 
-                <div class="menu-scroll-wrapper">
-                    <div class="drinks-scroll">
-                        <!-- Row 1: 3 drinks -->
-                        <div class="drink-row">
-                            <div class="drink-card" data-drink="pour-over">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Pour Over</div>
-                                </div>
-                            </div>
+                <div class="content">
+                    <div class="section" id="menu">
+                        <canvas id="liquid-canvas"></canvas>
+                        <h2 class="section-title">Menu</h2>
 
-                            <div class="drink-card" data-drink="cappuccino">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Cappuccino</div>
-                                </div>
-                            </div>
-
-                            <div class="drink-card" data-drink="latte">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Latte</div>
+                        <!-- Expanded drink detail view (hidden by default) -->
+                        <div class="drink-detail-view" id="drinkDetailView">
+                            <button class="drink-detail-back" id="drinkDetailBack">← back</button>
+                            <div class="drink-detail-content">
+                                <div class="drink-detail-illustration" id="drinkDetailIllustration"></div>
+                                <div class="drink-detail-info">
+                                    <h3 class="drink-detail-name" id="drinkDetailName"></h3>
+                                    <p class="drink-detail-desc" id="drinkDetailDesc"></p>
+                                    <div class="drink-detail-extras" id="drinkDetailExtras"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Row 2: 2 drinks (offset) -->
-                        <div class="drink-row offset">
-                            <div class="drink-card" data-drink="mocha">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Mocha</div>
+                        <div class="menu-scroll-wrapper" id="menuScrollWrapper">
+                            <div class="drinks-scroll">
+                                <div class="drink-card" data-drink="pour-over">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M20 30 L25 85 L55 85 L60 30 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="30" rx="20" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M25 45 Q40 55 55 45" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                                            <path d="M35 15 Q38 8 35 2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M45 15 Q48 8 45 2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Pour Over</div>
+                                        <div class="drink-desc">Clean, bright, single origin</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="cappuccino">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M15 40 L20 80 L60 80 L65 40 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="40" rx="25" ry="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="42" rx="18" ry="5" fill="currentColor" opacity="0.2"/>
+                                            <path d="M65 50 Q75 50 75 60 Q75 70 65 70" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M30 20 Q33 12 30 5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M40 18 Q43 10 40 3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M50 20 Q53 12 50 5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Cappuccino</div>
+                                        <div class="drink-desc">Espresso, steamed milk, velvet foam</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="latte">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M22 25 L25 85 L55 85 L58 25 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="25" rx="18" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="28" rx="12" ry="3" fill="currentColor" opacity="0.15"/>
+                                            <path d="M40 32 Q35 38 40 44 Q45 50 40 56" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                                            <path d="M35 15 Q38 8 35 2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M45 15 Q48 8 45 2" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Latte</div>
+                                        <div class="drink-desc">Smooth espresso, silky milk</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="mocha">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M18 35 L22 82 L58 82 L62 35 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="35" rx="22" ry="7" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M28 50 L52 50" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M30 60 L50 60" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                                            <circle cx="40" cy="38" r="8" fill="currentColor" opacity="0.2"/>
+                                            <path d="M35 20 Q38 12 35 5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M45 18 Q48 10 45 3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Mocha</div>
+                                        <div class="drink-desc">Espresso meets rich chocolate</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="hot-chocolate">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M15 38 L20 78 L60 78 L65 38 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="38" rx="25" ry="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <circle cx="32" cy="40" r="4" fill="currentColor" opacity="0.25"/>
+                                            <circle cx="44" cy="42" r="5" fill="currentColor" opacity="0.2"/>
+                                            <circle cx="50" cy="38" r="3" fill="currentColor" opacity="0.25"/>
+                                            <path d="M65 48 Q78 48 78 60 Q78 72 65 72" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M40 22 Q43 14 40 7" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Hot Chocolate</div>
+                                        <div class="drink-desc">Decadent cocoa, marshmallow clouds</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="matcha-latte">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M20 30 L24 85 L56 85 L60 30 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="30" rx="20" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="33" rx="14" ry="4" fill="currentColor" opacity="0.25"/>
+                                            <path d="M30 50 Q40 58 50 50" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M32 65 Q40 72 48 65" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+                                            <path d="M38 18 Q40 10 38 3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M42 18 Q44 10 42 3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Matcha Latte</div>
+                                        <div class="drink-desc">Ceremonial grade, oat milk</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="moroccan-mint">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M25 45 L28 80 L52 80 L55 45 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="45" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <path d="M40 40 L40 25 L35 20 M40 25 L45 20" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                            <ellipse cx="35" cy="18" rx="4" ry="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+                                            <ellipse cx="45" cy="18" rx="4" ry="6" fill="none" stroke="currentColor" stroke-width="1" opacity="0.6"/>
+                                            <path d="M38 30 Q40 22 38 15" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Moroccan Mint</div>
+                                        <div class="drink-desc">Fresh mint, green tea, honey</div>
+                                    </div>
+                                </div>
+
+                                <div class="drink-card" data-drink="something-different">
+                                    <div class="drink-illustration">
+                                        <svg viewBox="0 0 80 100" class="drink-svg">
+                                            <path d="M20 35 L25 82 L55 82 L60 35 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <ellipse cx="40" cy="35" rx="20" ry="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                            <text x="40" y="62" text-anchor="middle" font-size="24" fill="currentColor" opacity="0.6">?</text>
+                                            <path d="M32 20 Q35 12 32 5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M40 18 Q43 10 40 3" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                            <path d="M48 20 Q51 12 48 5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                        </svg>
+                                    </div>
+                                    <div class="drink-info">
+                                        <div class="drink-name">Surprise Me</div>
+                                        <div class="drink-desc">Trust the barista's choice</div>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div class="drink-card" data-drink="hot-chocolate">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Hot Chocolate</div>
-                                </div>
+                            <div class="menu-slider-container">
+                                <input type="range" id="menuSlider" min="0" max="100" value="0" class="menu-slider">
+                            </div>
+                            <div class="scroll-indicator">
+                                <span class="scroll-arrow">←</span>
+                                <span class="scroll-text">slide</span>
+                                <span class="scroll-arrow">→</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Row 3: 3 drinks -->
-                        <div class="drink-row">
-                            <div class="drink-card" data-drink="matcha-latte">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Matcha Latte</div>
+                    <div class="section" id="projects">
+                        <h2 class="section-title">Art Projects</h2>
+
+                        <div class="projects-grid">
+                            <div class="project-card" onclick="openProjectModal(projects.bayword)" style="cursor: pointer;">
+                                <div class="project-image">
+                                    <div class="project-icon" style="color: #ff4444;">~!</div>
+                                </div>
+                                <div class="project-content">
+                                    <div class="project-title">Bay Word</div>
+                                    <div class="project-subtitle">from people who drink the same coffee</div>
                                 </div>
                             </div>
 
-                            <div class="drink-card" data-drink="moroccan-mint">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Moroccan Mint</div>
+                            <div class="project-card" onclick="openProjectModal(projects.parallel)" style="cursor: pointer;">
+                                <div class="project-image">
+                                    <img src="https://i.imgur.com/qbQNpPI.jpeg" alt="ai character video game">
+                                </div>
+                                <div class="project-content">
+                                    <div class="project-title">Parallel, a video game</div>
+                                    <div class="project-subtitle">one world. many angles.</div>
                                 </div>
                             </div>
 
-                            <div class="drink-card" data-drink="something-different">
-                                <div class="drink-content">
-                                    <div class="drink-image"></div>
-                                    <div class="drink-name">Something Different</div>
+                            <div class="project-card" onclick="openProjectModal(projects.accumulate)" style="cursor: pointer;">
+                                <div class="project-image project-coming-soon">
+                                    <div class="ticker-wrapper">
+                                        <div class="ticker-container">
+                                            <div class="ticker-display" id="ticker"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="project-content">
+                                    <div class="project-title">Accumulate Dollars</div>
+                                    <div class="project-subtitle">nat's november pa earnings</div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <div class="section" id="team">
+                        <div class="section-header" onclick="toggleTeam()">
+                            <h2 class="section-title" style="margin-bottom: 0;">Team<button class="toggle-arrow" id="teamToggle">▼</button></h2>
+                        </div>
+                        <div class="team-content" id="teamContent">
+                            <div class="team-grid">
+                                <div class="team-member">
+                                    <div class="team-photo">
+                                        <img src="https://i.imgur.com/S8uEoBR.jpeg" alt="Leah">
+                                    </div>
+                                    <div class="team-name">Leah</div>
+                                    <div class="team-title">drive</div>
+                                </div>
+
+                                <div class="team-member">
+                                    <div class="team-photo">
+                                        <img src="https://i.imgur.com/Y1V3sUO.jpeg" alt="Nat">
+                                    </div>
+                                    <div class="team-name">Nat</div>
+                                    <div class="team-title">ops</div>
+                                </div>
+
+                                <div class="team-member">
+                                    <div class="team-photo">
+                                        <img src="https://i.imgur.com/NpwCMTa.jpeg" alt="Ren">
+                                    </div>
+                                    <div class="team-name">Ren</div>
+                                    <div class="team-title">artist</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer>
+                        <div class="footer-links">
+                            <a href="https://x.com/gratifiedwegrow" target="_blank" class="footer-link">twitter</a>
+                            <a href="https://substack.com/@gratifiedwegrow" target="_blank" class="footer-link">substack</a>
+                            <a href="https://partiful.com/u/FYZcDQXvTPeptryuZgJ7" target="_blank" class="footer-link">partiful</a>
+                        </div>
+                    </footer>
                 </div>
             </div>
-
-            <div class="section" id="projects">
-                <h2 class="section-title">Art Projects</h2>
-
-                <div class="projects-grid">
-                    <div class="project-card" onclick="openProjectModal(projects.bayword)" style="cursor: pointer;">
-                        <div class="project-image">
-                            <div class="project-icon" style="color: #ff4444;">~!</div>
-                        </div>
-                        <div class="project-content">
-                            <div class="project-title">Bay Word</div>
-                            <div class="project-subtitle">from people who drink the same coffee</div>
-                        </div>
-                    </div>
-
-                    <div class="project-card" onclick="openProjectModal(projects.parallel)" style="cursor: pointer;">
-                        <div class="project-image">
-                            <img src="https://i.imgur.com/qbQNpPI.jpeg" alt="ai character video game">
-                        </div>
-                        <div class="project-content">
-                            <div class="project-title">Parallel, a video game</div>
-                            <div class="project-subtitle">one world. many angles.</div>
-                        </div>
-                    </div>
-
-                    <div class="project-card" onclick="openProjectModal(projects.accumulate)" style="cursor: pointer;">
-                        <div class="project-image project-coming-soon">
-                            <div class="ticker-wrapper">
-                                <div class="ticker-container">
-                                    <div class="ticker-display" id="ticker"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="project-content">
-                            <div class="project-title">Accumulate Dollars</div>
-                            <div class="project-subtitle">nat's november pa earnings</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section" id="team">
-                <div class="section-header" onclick="toggleTeam()">
-                    <h2 class="section-title" style="margin-bottom: 0;">Team<button class="toggle-arrow" id="teamToggle">▼</button></h2>
-                </div>
-                <div class="team-content" id="teamContent">
-                    <div class="team-grid">
-                        <div class="team-member">
-                            <div class="team-photo">
-                                <img src="https://i.imgur.com/S8uEoBR.jpeg" alt="Leah">
-                            </div>
-                            <div class="team-name">Leah</div>
-                            <div class="team-title">drive</div>
-                        </div>
-
-                        <div class="team-member">
-                            <div class="team-photo">
-                                <img src="https://i.imgur.com/Y1V3sUO.jpeg" alt="Nat">
-                            </div>
-                            <div class="team-name">Nat</div>
-                            <div class="team-title">ops</div>
-                        </div>
-
-                        <div class="team-member">
-                            <div class="team-photo">
-                                <img src="https://i.imgur.com/NpwCMTa.jpeg" alt="Ren">
-                            </div>
-                            <div class="team-name">Ren</div>
-                            <div class="team-title">artist</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <footer>
-                <div class="footer-links">
-                    <a href="https://x.com/gratifiedwegrow" target="_blank" class="footer-link">twitter</a>
-                    <a href="https://substack.com/@gratifiedwegrow" target="_blank" class="footer-link">substack</a>
-                    <a href="https://partiful.com/u/FYZcDQXvTPeptryuZgJ7" target="_blank" class="footer-link">partiful</a>
-                </div>
-            </footer>
         </div>
+
+        <!-- ========== SUBSCRIPTION PAGE ========== -->
+        <div class="page" id="page-subscribe" data-page="subscribe">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">Subscribe</div>
+                    <div class="tagline">join the journey</div>
+                </div>
+
+                <div class="content">
+                    <div class="section">
+                        <h2 class="section-title">Membership Tiers</h2>
+                        <p class="section-intro">Support Gratified and get exclusive perks, early access, and behind-the-scenes content.</p>
+
+                        <div class="subscription-grid">
+                            <div class="subscription-card">
+                                <div class="sub-tier">Seedling</div>
+                                <div class="sub-price">$5<span>/month</span></div>
+                                <ul class="sub-perks">
+                                    <li>Monthly newsletter with popup locations</li>
+                                    <li>Early access to event announcements</li>
+                                    <li>10% off merch</li>
+                                </ul>
+                                <button class="sub-btn">Join Seedling</button>
+                            </div>
+
+                            <div class="subscription-card featured">
+                                <div class="sub-badge">Most Popular</div>
+                                <div class="sub-tier">Bloom</div>
+                                <div class="sub-price">$15<span>/month</span></div>
+                                <ul class="sub-perks">
+                                    <li>Everything in Seedling</li>
+                                    <li>One free drink per month at any popup</li>
+                                    <li>Exclusive Discord community access</li>
+                                    <li>Behind-the-scenes content</li>
+                                </ul>
+                                <button class="sub-btn primary">Join Bloom</button>
+                            </div>
+
+                            <div class="subscription-card">
+                                <div class="sub-tier">Harvest</div>
+                                <div class="sub-price">$35<span>/month</span></div>
+                                <ul class="sub-perks">
+                                    <li>Everything in Bloom</li>
+                                    <li>Unlimited drinks at popups</li>
+                                    <li>Quarterly art print from Ren</li>
+                                    <li>Priority booking for private events</li>
+                                    <li>Name on our supporters wall</li>
+                                </ul>
+                                <button class="sub-btn">Join Harvest</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">What You Get</h2>
+                        <div class="perks-showcase">
+                            <div class="perk-item">
+                                <div class="perk-icon">◆</div>
+                                <h3>Community</h3>
+                                <p>Join a Discord of coffee lovers, artists, and dreamers. Share your creations, get feedback, and connect.</p>
+                            </div>
+                            <div class="perk-item">
+                                <div class="perk-icon">◆</div>
+                                <h3>Exclusive Content</h3>
+                                <p>Behind-the-scenes looks at art projects, coffee sourcing journeys, and popup planning.</p>
+                            </div>
+                            <div class="perk-item">
+                                <div class="perk-icon">◆</div>
+                                <h3>Real Perks</h3>
+                                <p>Free drinks, merch discounts, and priority access to limited events and collaborations.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== PARTNERSHIPS PAGE ========== -->
+        <div class="page" id="page-partnerships" data-page="partnerships">
+            <div class="container">
+                <div class="header">
+                    <div class="logo">Partner</div>
+                    <div class="tagline">grow with us</div>
+                </div>
+
+                <div class="content">
+                    <div class="section">
+                        <h2 class="section-title">Work With Us</h2>
+                        <p class="section-intro">We're always looking for venues, brands, and creatives who share our vision of community through coffee and art.</p>
+
+                        <div class="partnership-options">
+                            <div class="partner-card">
+                                <h3 class="partner-title">Host a Popup</h3>
+                                <p>Have a space that needs some warmth? We bring the coffee, the vibes, and the crowd. Perfect for:</p>
+                                <ul>
+                                    <li>Coworking spaces</li>
+                                    <li>Art galleries</li>
+                                    <li>Retail stores</li>
+                                    <li>Community centers</li>
+                                </ul>
+                                <button class="partner-btn" onclick="openBookingModal()">Inquire About Hosting</button>
+                            </div>
+
+                            <div class="partner-card">
+                                <h3 class="partner-title">Brand Collaborations</h3>
+                                <p>Looking to reach a creative, engaged audience? Let's create something beautiful together:</p>
+                                <ul>
+                                    <li>Sponsored popups</li>
+                                    <li>Co-branded merchandise</li>
+                                    <li>Event partnerships</li>
+                                    <li>Content collaborations</li>
+                                </ul>
+                                <button class="partner-btn" onclick="openBookingModal()">Start a Conversation</button>
+                            </div>
+
+                            <div class="partner-card">
+                                <h3 class="partner-title">Join the Team</h3>
+                                <p>Passionate about coffee, art, or community building? We're growing and looking for:</p>
+                                <ul>
+                                    <li>Baristas (training provided)</li>
+                                    <li>Event coordinators</li>
+                                    <li>Social media creators</li>
+                                    <li>Artists and designers</li>
+                                </ul>
+                                <button class="partner-btn">Apply Now</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">Past Partners</h2>
+                        <p class="partners-note">We've had the pleasure of working with amazing venues and brands across the Bay Area.</p>
+                        <div class="partners-logos">
+                            <div class="partner-logo-placeholder">Your logo here</div>
+                            <div class="partner-logo-placeholder">Your logo here</div>
+                            <div class="partner-logo-placeholder">Your logo here</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== BUTTERCUP DESTINY PAGE ========== -->
+        <div class="page" id="page-buttercup" data-page="buttercup">
+            <div class="container">
+                <div class="header">
+                    <div class="logo buttercup-logo">Buttercup Destiny</div>
+                    <div class="tagline">a gratified project</div>
+                </div>
+
+                <div class="content">
+                    <div class="section buttercup-hero">
+                        <div class="buttercup-visual">
+                            <svg viewBox="0 0 200 200" class="buttercup-flower">
+                                <defs>
+                                    <radialGradient id="petalGrad" cx="50%" cy="50%" r="50%">
+                                        <stop offset="0%" style="stop-color:#FFE066"/>
+                                        <stop offset="100%" style="stop-color:#F0B832"/>
+                                    </radialGradient>
+                                </defs>
+                                <!-- Petals -->
+                                <ellipse cx="100" cy="60" rx="25" ry="40" fill="url(#petalGrad)" opacity="0.9"/>
+                                <ellipse cx="140" cy="85" rx="25" ry="40" fill="url(#petalGrad)" opacity="0.85" transform="rotate(72 100 100)"/>
+                                <ellipse cx="130" cy="130" rx="25" ry="40" fill="url(#petalGrad)" opacity="0.8" transform="rotate(144 100 100)"/>
+                                <ellipse cx="70" cy="130" rx="25" ry="40" fill="url(#petalGrad)" opacity="0.85" transform="rotate(216 100 100)"/>
+                                <ellipse cx="60" cy="85" rx="25" ry="40" fill="url(#petalGrad)" opacity="0.9" transform="rotate(288 100 100)"/>
+                                <!-- Center -->
+                                <circle cx="100" cy="100" r="20" fill="#CC5500"/>
+                                <circle cx="100" cy="100" r="12" fill="#8B7355"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-title buttercup-title">What is Buttercup Destiny?</h2>
+                        <p class="buttercup-description">
+                            Buttercup Destiny is an exploration of fate, choice, and the small moments that shape our paths.
+                            Part art installation, part interactive experience, part coffee ritual — it's our most ambitious project yet.
+                        </p>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">The Concept</h2>
+                        <div class="buttercup-concept-grid">
+                            <div class="concept-item">
+                                <div class="concept-number">01</div>
+                                <h3>The Reading</h3>
+                                <p>Order a drink. Receive a fortune — not from a cookie, but from a buttercup. Each petal holds a possibility.</p>
+                            </div>
+                            <div class="concept-item">
+                                <div class="concept-number">02</div>
+                                <h3>The Choice</h3>
+                                <p>Your fortune isn't set. It's a crossroads. What you do next writes the story.</p>
+                            </div>
+                            <div class="concept-item">
+                                <div class="concept-number">03</div>
+                                <h3>The Archive</h3>
+                                <p>Every reading is recorded (anonymously). Watch the collective destiny of our community unfold.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h2 class="section-title">Coming Soon</h2>
+                        <p class="section-intro">Buttercup Destiny launches at select popups in Spring 2025. Subscribe to be the first to know.</p>
+                        <div class="buttercup-signup">
+                            <input type="email" class="form-input" placeholder="your email">
+                            <button class="cta-btn primary">Notify Me</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Booking Modal -->
@@ -269,21 +607,20 @@
 
     <!-- Mobile Bottom Navbar -->
     <nav class="mobile-navbar">
-        <a href="#" class="mobile-nav-item" onclick="scrollToSection('menu')">
-            <span class="mobile-nav-icon">&#9749;</span>
-            <span class="mobile-nav-label">Menu</span>
+        <a href="#landing" class="mobile-nav-item" data-page="landing">
+            <span class="mobile-nav-icon icon-dash"></span>
         </a>
-        <a href="#" class="mobile-nav-item" onclick="scrollToSection('projects')">
-            <span class="mobile-nav-icon">&#9998;</span>
-            <span class="mobile-nav-label">Art</span>
+        <a href="#about" class="mobile-nav-item" data-page="about">
+            <span class="mobile-nav-icon icon-equal"></span>
         </a>
-        <a href="#" class="mobile-nav-item" onclick="scrollToSection('team')">
-            <span class="mobile-nav-icon">&#9734;</span>
-            <span class="mobile-nav-label">Team</span>
+        <a href="#subscribe" class="mobile-nav-item" data-page="subscribe">
+            <span class="mobile-nav-icon icon-diamond">◆</span>
         </a>
-        <a href="https://x.com/gratifiedwegrow" target="_blank" class="mobile-nav-item">
-            <span class="mobile-nav-icon">&#10054;</span>
-            <span class="mobile-nav-label">Social</span>
+        <a href="#partnerships" class="mobile-nav-item" data-page="partnerships">
+            <span class="mobile-nav-icon icon-bronze">■</span>
+        </a>
+        <a href="#buttercup" class="mobile-nav-item" data-page="buttercup">
+            <span class="mobile-nav-icon icon-yellow">⬠</span>
         </a>
     </nav>
 

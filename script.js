@@ -5,20 +5,45 @@
 
     const ctx = canvas.getContext('2d');
     let particles = [];
-    const PARTICLE_COUNT = 600;
+    // Reduced particle count for better performance across browsers
+    const PARTICLE_COUNT = 200;
 
-    // Logo colors for each drink (matches drink base colors)
-    const drinkLogoColors = {
+    // Logo colors for each drink - theme awarthree for accessibility
+    const drinkLogoColorsLight = {
         'default': '#2d2926',      // Charcoal ink (original)
-        'pour-over': '#c28d5a',    // Light amber
-        'cappuccino': '#593320',   // Dark espresso
-        'latte': '#8c6241',        // Milky coffee
-        'mocha': '#472618',        // Dark chocolate coffee
-        'hot-chocolate': '#401f14', // Rich chocolate
-        'matcha-latte': '#738c4d', // Matcha green
-        'moroccan-mint': '#598059', // Mint tea green
-        'something-different': '#bf7389' // Dusty rose
+        'pour-over': '#8a6035',    // Darker amber for light bg
+        'cappuccino': '#4a2a1a',   // Dark espresso
+        'latte': '#6b4d35',        // Darker milky coffee
+        'mocha': '#3d2015',        // Dark chocolate coffee
+        'hot-chocolate': '#351a10', // Rich chocolate
+        'matcha-latte': '#4a5c30', // Darker matcha green
+        'moroccan-mint': '#3d5a3d', // Darker mint
+        'something-different': '#8a4a5a' // Darker dusty rose
     };
+
+    const drinkLogoColorsDark = {
+        'default': '#d4cdc5',      // Light warm gray
+        'pour-over': '#d4a870',    // Light amber
+        'cappuccino': '#c4a080',   // Light espresso cream
+        'latte': '#c9b090',        // Light milky coffee
+        'mocha': '#b08060',        // Light chocolate
+        'hot-chocolate': '#c49070', // Light cocoa
+        'matcha-latte': '#9ab070', // Light matcha
+        'moroccan-mint': '#80b080', // Light mint
+        'something-different': '#d4a0b0' // Light rose
+    };
+
+    // Helper to get current theme
+    function getCurrentTheme() {
+        return document.documentElement.getAttribute('data-theme') || 'light';
+    }
+
+    // Get the appropriate logo color based on theme
+    function getLogoColor(drinkId) {
+        const theme = getCurrentTheme();
+        const colors = theme === 'dark' ? drinkLogoColorsDark : drinkLogoColorsLight;
+        return colors[drinkId] || colors['default'];
+    }
 
     // Color palettes for each drink
     const drinkSpiceColors = {
@@ -112,20 +137,42 @@
     }, { passive: true });
 
     function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        const oldWidth = canvas.width || window.innerWidth;
+        const oldHeight = canvas.height || window.innerHeight;
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        // Scale existing particle positions proportionally
+        if (particles.length > 0 && oldWidth > 0 && oldHeight > 0) {
+            const scaleX = newWidth / oldWidth;
+            const scaleY = newHeight / oldHeight;
+
+            particles.forEach(p => {
+                // Scale position proportionally
+                p.x *= scaleX;
+                p.y *= scaleY;
+
+                // Ensure particles stay within bounds
+                p.x = Math.max(0, Math.min(p.x, newWidth));
+                p.y = Math.max(0, Math.min(p.y, newHeight));
+            });
+        }
     }
 
     function createParticle() {
         const color = currentColors[Math.floor(Math.random() * currentColors.length)];
+        // Use larger sizes to simulate blur effect (better cross-browser than ctx.filter)
+        const baseSize = Math.random() * 4 + 2;
         return {
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            size: Math.random() * 3 + 1,           // Thicker: was 2 + 0.5, now 3 + 1
+            size: baseSize,
             speedX: (Math.random() - 0.5) * 0.3,
             speedY: Math.random() * 0.2 + 0.05,
-            opacity: Math.random() * 0.35 + 0.1,   // Slightly softer opacity for blur effect
-            blur: Math.random() * 3 + 2,           // Blur radius for each particle (increased)
+            opacity: Math.random() * 0.25 + 0.08,  // Lower opacity for soft look
             color: { ...color },
             targetColor: { ...color },
             colorIndex: Math.floor(Math.random() * currentColors.length),
@@ -188,18 +235,22 @@
 
             // Apply parallax offset based on particle depth (size as proxy for depth)
             // Larger particles move more (appear closer), smaller particles move less (appear farther)
-            const depthFactor = (p.size / 4) * parallaxStrength;
+            const depthFactor = (p.size / 6) * parallaxStrength;
             const parallaxOffsetY = scrollY * depthFactor;
 
-            // Draw with blur
-            ctx.save();
-            ctx.filter = `blur(${p.blur}px)`;
+            // Draw with shadowBlur for cross-browser soft glow effect
+            // This works in Safari, Firefox, and Chrome consistently
+            const colorStr = `rgba(${Math.round(p.color.r)}, ${Math.round(p.color.g)}, ${Math.round(p.color.b)}, ${p.opacity})`;
             ctx.beginPath();
             ctx.arc(p.x, p.y - parallaxOffsetY, p.size, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${Math.round(p.color.r)}, ${Math.round(p.color.g)}, ${Math.round(p.color.b)}, ${p.opacity})`;
+            ctx.fillStyle = colorStr;
+            ctx.shadowColor = colorStr;
+            ctx.shadowBlur = p.size * 2;
             ctx.fill();
-            ctx.restore();
         });
+
+        // Reset shadow after drawing all particles
+        ctx.shadowBlur = 0;
 
         requestAnimationFrame(animate);
     }
@@ -216,19 +267,114 @@
         }
     };
 
-    // Expose function to change logo color based on drink
-    window.setLogoColor = function(drinkId) {
-        const logo = document.querySelector('.logo');
-        if (logo) {
-            logo.style.transition = 'color 0.5s ease';
-            if (drinkId === 'default' || !drinkLogoColors[drinkId]) {
-                // Reset to CSS variable (respects light/dark theme)
-                logo.style.color = '';
-            } else {
-                logo.style.color = drinkLogoColors[drinkId];
+    // Track current drink for theme change updates
+    let currentDrinkTheme = 'default';
+
+    // Elements that should be themed with drink colors
+    const getThemedElements = () => ({
+        logos: document.querySelectorAll('.logo'),
+        menuTitle: document.querySelector('#menu .section-title'),
+        projectsTitle: document.querySelector('#projects .section-title'),
+        teamTitle: document.querySelector('#team .section-title'),
+        drinkDetailName: document.querySelector('.drink-detail-name'),
+        menuSection: document.querySelector('#menu'),
+        projectsSection: document.querySelector('#projects'),
+        teamSection: document.querySelector('#team'),
+        drinkCards: document.querySelectorAll('.drink-card'),
+        projectCards: document.querySelectorAll('.project-card'),
+        teamMembers: document.querySelectorAll('.team-member'),
+        footerLinks: document.querySelectorAll('.footer-link'),
+        themeToggle: document.querySelector('.theme-toggle'),
+        // Navigation elements
+        mainNav: document.querySelector('.main-nav'),
+        navLinks: document.querySelectorAll('.nav-link'),
+        mobileNavbar: document.querySelector('.mobile-navbar'),
+        mobileNavIcons: document.querySelectorAll('.mobile-nav-icon')
+    });
+
+    // Apply drink theme colors to all relevant elements
+    window.setDrinkTheme = function(drinkId) {
+        currentDrinkTheme = drinkId;
+        const elements = getThemedElements();
+        const color = drinkId === 'default' ? '' : getLogoColor(drinkId);
+
+        // All logos across pages
+        elements.logos.forEach(logo => {
+            logo.style.color = color;
+        });
+
+        // Section titles and drink detail name
+        [elements.menuTitle, elements.projectsTitle, elements.teamTitle, elements.drinkDetailName].forEach(title => {
+            if (title) {
+                title.style.color = color;
             }
+        });
+
+        // Section borders (the ::before pseudo-element border)
+        [elements.menuSection, elements.projectsSection, elements.teamSection].forEach(section => {
+            if (section) {
+                section.style.setProperty('--drink-accent', color || 'var(--dusty-rose)');
+            }
+        });
+
+        // Drink card borders
+        elements.drinkCards.forEach(card => {
+            card.style.borderColor = color || '';
+        });
+
+        // Project card borders
+        elements.projectCards.forEach(card => {
+            card.style.borderColor = color || '';
+        });
+
+        // Team member borders
+        elements.teamMembers.forEach(member => {
+            member.style.borderColor = color || '';
+        });
+
+        // Theme toggle border
+        if (elements.themeToggle) {
+            elements.themeToggle.style.borderColor = color || '';
         }
+
+        // Desktop navigation
+        if (elements.mainNav) {
+            elements.mainNav.style.borderColor = color || '';
+        }
+        elements.navLinks.forEach(link => {
+            // Only style active links with the drink color
+            if (link.classList.contains('active')) {
+                link.style.color = color || '';
+                link.style.borderColor = color || '';
+            } else {
+                link.style.color = '';
+                link.style.borderColor = '';
+            }
+        });
+
+        // Mobile navigation
+        if (elements.mobileNavbar) {
+            elements.mobileNavbar.style.borderColor = color || '';
+        }
+
+        // Update CSS custom property for mobile nav icons
+        document.documentElement.style.setProperty('--drink-nav-color', color || 'var(--dusty-rose)');
     };
+
+    // Keep setLogoColor as alias for backwards compatibility
+    window.setLogoColor = function(drinkId) {
+        window.setDrinkTheme(drinkId);
+    };
+
+    // Update all themed elements when theme changes
+    const themeObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'data-theme' && currentDrinkTheme !== 'default') {
+                window.setDrinkTheme(currentDrinkTheme);
+            }
+        });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true });
 
     window.addEventListener('resize', resize);
 
@@ -648,6 +794,161 @@ function goToSlide(index) {
     startModalSlideshow();
 }
 
+// ===== DRINK DETAIL DATA =====
+const drinkDetails = {
+    'pour-over': {
+        name: 'Pour Over',
+        desc: 'A clean, bright cup that highlights the unique characteristics of single origin beans. Hand-poured with precision, this method brings out delicate floral and fruity notes.',
+        extras: '<p>Origin: rotating seasonal selection</p><p>Brewing time: 3-4 minutes</p>'
+    },
+    'cappuccino': {
+        name: 'Cappuccino',
+        desc: 'The perfect balance of bold espresso, steamed milk, and velvety microfoam. A classic Italian preparation with a rich, creamy texture.',
+        extras: '<p>Double shot espresso</p><p>Oat milk available</p>'
+    },
+    'latte': {
+        name: 'Latte',
+        desc: 'Smooth espresso married with silky steamed milk. A gentle, approachable coffee with a delicate sweetness from the milk.',
+        extras: '<p>Add flavor: vanilla, lavender, cardamom</p><p>Extra shot available</p>'
+    },
+    'mocha': {
+        name: 'Mocha',
+        desc: 'Where coffee meets chocolate in perfect harmony. Rich espresso blended with house-made chocolate and steamed milk.',
+        extras: '<p>Dark chocolate ganache</p><p>Whipped cream optional</p>'
+    },
+    'hot-chocolate': {
+        name: 'Hot Chocolate',
+        desc: 'Decadent Belgian chocolate melted into steamed milk, topped with pillowy marshmallow clouds. Pure comfort in a cup.',
+        extras: '<p>Made with real chocolate</p><p>Vegan version available</p>'
+    },
+    'matcha-latte': {
+        name: 'Matcha Latte',
+        desc: 'Ceremonial grade matcha whisked to perfection with your choice of milk. Earthy, umami-rich, and subtly sweet.',
+        extras: '<p>Ceremonial grade from Uji, Japan</p><p>Iced option available</p>'
+    },
+    'moroccan-mint': {
+        name: 'Moroccan Mint',
+        desc: 'Fresh spearmint leaves steeped with green tea and a touch of honey. Refreshing and aromatic, a taste of Marrakech.',
+        extras: '<p>Fresh mint daily</p><p>Caffeine-free option with herbal base</p>'
+    },
+    'something-different': {
+        name: 'Surprise Me',
+        desc: 'Trust your barista to craft something special just for you. Tell us your mood, and we\'ll create a drink to match.',
+        extras: '<p>Always an adventure</p><p>Seasonal specials included</p>'
+    }
+};
+
+// ===== DRINK DETAIL VIEW =====
+(function initDrinkDetailView() {
+    const detailView = document.getElementById('drinkDetailView');
+    const scrollWrapper = document.getElementById('menuScrollWrapper');
+    const backButton = document.getElementById('drinkDetailBack');
+    const detailIllustration = document.getElementById('drinkDetailIllustration');
+    const detailName = document.getElementById('drinkDetailName');
+    const detailDesc = document.getElementById('drinkDetailDesc');
+    const detailExtras = document.getElementById('drinkDetailExtras');
+
+    if (!detailView || !scrollWrapper || !backButton) return;
+
+    // Show detail view for a drink
+    window.showDrinkDetail = function(drinkId, cardElement) {
+        const details = drinkDetails[drinkId];
+        if (!details) return;
+
+        // Copy the SVG from the card
+        const svg = cardElement.querySelector('.drink-svg');
+        if (svg) {
+            detailIllustration.innerHTML = svg.outerHTML;
+        }
+
+        // Set the content
+        detailName.textContent = details.name;
+        detailDesc.textContent = details.desc;
+        detailExtras.innerHTML = details.extras;
+
+        // Hide scroll wrapper, show detail view
+        scrollWrapper.classList.add('hidden');
+        detailView.classList.add('active');
+
+        // Trigger animation after display change
+        requestAnimationFrame(() => {
+            detailView.style.opacity = '1';
+            detailView.style.transform = 'translateY(0)';
+        });
+    };
+
+    // Hide detail view and show scroll menu
+    window.hideDrinkDetail = function() {
+        detailView.classList.remove('active');
+        scrollWrapper.classList.remove('hidden');
+
+        // Reset liquid shader and colors
+        if (window.setLiquidDrink) setLiquidDrink('none');
+        if (window.setSpiceColors) setSpiceColors('default');
+        if (window.setLogoColor) setLogoColor('default');
+
+        // Remove selected state from cards
+        document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('selected'));
+    };
+
+    // Back button handler
+    backButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        hideDrinkDetail();
+    });
+})();
+
+// ===== MENU SLIDER CONTROL =====
+(function initMenuSlider() {
+    const slider = document.getElementById('menuSlider');
+    const scrollContainer = document.querySelector('.drinks-scroll');
+    if (!slider || !scrollContainer) return;
+
+    let isSliderActive = false;
+
+    // Update slider when scrolling manually (only if slider not being used)
+    scrollContainer.addEventListener('scroll', () => {
+        if (isSliderActive) return;
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        if (maxScroll > 0) {
+            slider.value = (scrollContainer.scrollLeft / maxScroll) * 100;
+        }
+    });
+
+    // Disable scroll-snap while dragging slider for smooth movement
+    slider.addEventListener('mousedown', () => {
+        isSliderActive = true;
+        scrollContainer.style.scrollSnapType = 'none';
+        scrollContainer.style.scrollBehavior = 'auto';
+    });
+
+    slider.addEventListener('touchstart', () => {
+        isSliderActive = true;
+        scrollContainer.style.scrollSnapType = 'none';
+        scrollContainer.style.scrollBehavior = 'auto';
+    }, { passive: true });
+
+    // Re-enable scroll-snap when done
+    const endSliderDrag = () => {
+        if (!isSliderActive) return;
+        isSliderActive = false;
+        // Small delay before re-enabling snap to let the scroll settle
+        setTimeout(() => {
+            scrollContainer.style.scrollSnapType = 'x mandatory';
+            scrollContainer.style.scrollBehavior = 'smooth';
+        }, 150);
+    };
+
+    window.addEventListener('mouseup', endSliderDrag);
+    window.addEventListener('touchend', endSliderDrag);
+
+    // Scroll when slider changes
+    slider.addEventListener('input', () => {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        scrollContainer.scrollLeft = (slider.value / 100) * maxScroll;
+    });
+})();
+
 // ===== COFFEE CUP LIQUID SHADER =====
 // Configurable drink properties - edit these to customize each drink's appearance
 const drinkConfigs = {
@@ -801,24 +1102,23 @@ const defaultDrink = 'none';
 
             float time = u_time * u_flowSpeed * 0.3;
 
-            // Create wavy surface at the fill level
-            float waveStrength = 0.02 * (1.0 - u_viscosity * 0.7);
-            float wave1 = sin(uv.x * 8.0 + time * 2.0) * waveStrength;
-            float wave2 = sin(uv.x * 12.0 - time * 1.5) * waveStrength * 0.5;
-            float wave3 = sin(uv.x * 20.0 + time * 3.0) * waveStrength * 0.25;
-            float surfaceWave = wave1 + wave2 + wave3;
+            // Create zigzag/sawtooth diamond-like surface pattern
+            float waveStrength = 0.035;
+            // Triangle wave function for sharp zigzag peaks
+            float triWave1 = abs(mod(uv.x * 8.0 + time * 0.5, 2.0) - 1.0) * waveStrength;
+            float triWave2 = abs(mod(uv.x * 12.0 - time * 0.3, 2.0) - 1.0) * waveStrength * 0.5;
+            float surfaceWave = triWave1 + triWave2 - waveStrength * 0.75;
 
             // The liquid fill level (0 = bottom, 1 = top)
             float liquidSurface = u_fillLevel + surfaceWave;
 
-            // Foam sits on top of liquid
-            float foamStart = liquidSurface;
-            float foamEnd = liquidSurface + u_foamHeight;
+            // Smooth edges for anti-aliasing but sharp zigzag shape
+            float inLiquid = smoothstep(0.0, 0.005, uv.y) * smoothstep(liquidSurface + 0.003, liquidSurface - 0.003, uv.y);
 
-            // Check if we're in the liquid, foam, or empty region
-            // Sharper edges at the liquid surface
-            float inLiquid = smoothstep(0.0, 0.01, uv.y) * smoothstep(liquidSurface + 0.005, liquidSurface - 0.005, uv.y);
-            float inFoam = smoothstep(foamStart - 0.005, foamStart + 0.01, uv.y) * smoothstep(foamEnd + 0.005, foamEnd - 0.005, uv.y);
+            // Stroke line at the top of the liquid (using secondary color)
+            float strokeWidth = 0.008;
+            float inStroke = smoothstep(liquidSurface - strokeWidth - 0.002, liquidSurface - strokeWidth, uv.y)
+                           * smoothstep(liquidSurface + 0.002, liquidSurface - 0.002, uv.y);
 
             // Empty state (when fillLevel is 0)
             if (u_fillLevel < 0.01) {
@@ -831,19 +1131,20 @@ const defaultDrink = 'none';
 
             // Swirl patterns (if enabled)
             if (u_hasSwirl > 0.5) {
-                // Create rotating swirl pattern
+                // Create distributed swirl pattern without center glow
                 vec2 center = vec2(0.5, u_fillLevel * 0.5);
                 vec2 toCenter = uv - center;
                 float dist = length(toCenter);
                 float angle = atan(toCenter.y, toCenter.x);
 
-                // Spiral effect
-                float spiral = sin(angle * 3.0 + dist * 10.0 - time * 1.5) * 0.5 + 0.5;
-                float swirlMask = smoothstep(0.4, 0.0, dist) * spiral;
+                // Spiral ribbons that don't concentrate at center
+                float spiral = sin(angle * 4.0 + dist * 15.0 - time * 1.2) * 0.5 + 0.5;
+                // Ring-shaped mask instead of center-focused
+                float swirlMask = smoothstep(0.05, 0.15, dist) * smoothstep(0.5, 0.2, dist) * spiral;
 
                 // Cream swirl mixing into coffee
                 float creamSwirl = fbm(vec2(angle * 2.0 + time * 0.5, dist * 5.0 - time * 0.3)) * swirlMask;
-                liquidColor = mix(liquidColor, u_secondaryColor, creamSwirl * 0.6);
+                liquidColor = mix(liquidColor, u_secondaryColor, creamSwirl * 0.5);
             }
 
             // Depth gradient - darker at bottom
@@ -859,24 +1160,6 @@ const defaultDrink = 'none';
             float movement = fbm(uv * 3.0 + time * 0.2);
             liquidColor = mix(liquidColor, liquidColor * 1.1, movement * 0.2);
 
-            // === FOAM RENDERING ===
-            vec3 foamColor = u_secondaryColor;
-
-            // Foam texture - bubbly appearance
-            float foamNoise = fbm(uv * 15.0 + time * 0.1);
-            float bubbles = smoothstep(0.3, 0.7, noise(uv * 30.0 + time * 0.05));
-
-            // Foam gets lighter and more textured
-            foamColor = mix(foamColor, vec3(1.0), foamNoise * 0.3 + bubbles * 0.2);
-
-            // Foam edge softness
-            float foamEdge = smoothstep(foamStart, foamStart + u_foamHeight * 0.3, uv.y);
-            foamColor *= 0.95 + foamEdge * 0.05;
-
-            // Small bubble highlights
-            float bubbleHighlight = smoothstep(0.6, 0.8, noise(uv * 50.0)) * 0.2;
-            foamColor += bubbleHighlight;
-
             // === COMBINE ===
             vec3 finalColor = vec3(0.0);
             float finalAlpha = 0.0;
@@ -886,15 +1169,12 @@ const defaultDrink = 'none';
                 finalAlpha = inLiquid * 0.4;
             }
 
-            if (inFoam > 0.01 && u_foamHeight > 0.01) {
-                // Foam overlays liquid
-                finalColor = mix(finalColor, foamColor, inFoam);
-                finalAlpha = max(finalAlpha, inFoam * 0.5);
+            // Add stroke line at top in secondary color (darker version for contrast)
+            if (inStroke > 0.01) {
+                vec3 strokeColor = u_secondaryColor * 0.7; // Slightly darker for visibility
+                finalColor = mix(finalColor, strokeColor, inStroke * 0.9);
+                finalAlpha = max(finalAlpha, inStroke * 0.6);
             }
-
-            // Edge softness at the surface (tighter for sharper edge)
-            float surfaceSoftness = smoothstep(liquidSurface + 0.01, liquidSurface - 0.005, uv.y);
-            finalAlpha *= surfaceSoftness;
 
             gl_FragColor = vec4(finalColor * finalAlpha, finalAlpha);
         }
@@ -1057,13 +1337,34 @@ const defaultDrink = 'none';
         entries.forEach(entry => {
             isVisible = entry.isIntersecting;
             if (isVisible) {
+                resize(); // Re-calculate size when becoming visible
                 startAnimation();
             }
         });
-    }, { threshold: 0.1 }); // Trigger when 10% visible
+    }, { threshold: 0.01 }); // Lower threshold to trigger sooner
 
     if (menuEl) {
         observer.observe(menuEl);
+    }
+
+    // Also listen for page transitions - resize canvas when about page becomes active
+    const aboutPage = document.getElementById('page-about');
+    if (aboutPage) {
+        const pageObserver = new MutationObserver((mutations) => {
+            mutations.forEach(mutation => {
+                if (mutation.attributeName === 'class') {
+                    if (aboutPage.classList.contains('active')) {
+                        // Small delay to ensure the page is fully visible
+                        setTimeout(() => {
+                            resize();
+                            isVisible = true;
+                            startAnimation();
+                        }, 50);
+                    }
+                }
+            });
+        });
+        pageObserver.observe(aboutPage, { attributes: true });
     }
 
     // Start animation
@@ -1087,24 +1388,101 @@ const defaultDrink = 'none';
             // Visual feedback - highlight selected card
             document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
+
+            // Show the drink detail view
+            if (window.showDrinkDetail) {
+                window.showDrinkDetail(drinkId, card);
+            }
+        });
+    });
+})();
+
+// ========== PAGE NAVIGATION SYSTEM ==========
+(function initPageNavigation() {
+    let currentPage = 'landing';
+    const transitionDuration = 500; // ms
+
+    // Get page from URL hash on load
+    function getPageFromHash() {
+        const hash = window.location.hash.replace('#', '');
+        return hash || 'landing';
+    }
+
+    // Navigate to a page with smooth transition
+    window.navigateTo = function(pageName) {
+        if (pageName === currentPage) return;
+
+        const currentPageEl = document.querySelector(`.page[data-page="${currentPage}"]`);
+        const nextPageEl = document.querySelector(`.page[data-page="${pageName}"]`);
+
+        if (!nextPageEl) return;
+
+        // Start exit animation on current page
+        if (currentPageEl) {
+            currentPageEl.classList.add('exiting');
+            currentPageEl.classList.remove('active');
+        }
+
+        // Update URL hash
+        window.history.pushState(null, '', `#${pageName}`);
+
+        // After exit animation, show new page
+        setTimeout(() => {
+            if (currentPageEl) {
+                currentPageEl.classList.remove('exiting');
+            }
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'instant' });
+
+            // Activate new page
+            nextPageEl.classList.add('active');
+            currentPage = pageName;
+
+            // Update navigation active states
+            updateNavActiveStates(pageName);
+
+        }, transitionDuration / 2);
+    };
+
+    // Update active states on nav links
+    function updateNavActiveStates(pageName) {
+        // Desktop nav
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.toggle('active', link.dataset.page === pageName);
+        });
+
+        // Mobile nav
+        document.querySelectorAll('.mobile-nav-item').forEach(link => {
+            link.classList.toggle('active', link.dataset.page === pageName);
+        });
+    }
+
+    // Handle nav link clicks
+    document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageName = link.dataset.page;
+            if (pageName) {
+                navigateTo(pageName);
+            }
         });
     });
 
-    // Click anywhere else in the menu section resets to empty
-    const menuSection = document.getElementById('menu');
-    if (menuSection) {
-        menuSection.addEventListener('click', (e) => {
-            // Only reset if clicking directly on the section (not on cards)
-            if (e.target === menuSection || e.target.closest('.menu-scroll-wrapper') && !e.target.closest('.drink-card')) {
-                setLiquidDrink('none');
-                if (window.setSpiceColors) {
-                    window.setSpiceColors('default');
-                }
-                if (window.setLogoColor) {
-                    window.setLogoColor('default');
-                }
-                document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('selected'));
-            }
-        });
-    }
+    // Handle browser back/forward
+    window.addEventListener('popstate', () => {
+        const pageName = getPageFromHash();
+        navigateTo(pageName);
+    });
+
+    // Initialize on load
+    const initialPage = getPageFromHash();
+    currentPage = initialPage;
+
+    // Set initial active states
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.toggle('active', page.dataset.page === initialPage);
+    });
+    updateNavActiveStates(initialPage);
+
 })();
