@@ -1,6 +1,8 @@
 # Gratified
 
-A traveling coffee popup website bringing warmth, creativity, and community.
+A coffee + art experience bringing warmth, creativity, and community.
+
+Part of **Buttercup Destiny**.
 
 ## Features
 
@@ -8,23 +10,30 @@ A traveling coffee popup website bringing warmth, creativity, and community.
 - Animated particle system with drink-themed color palettes
 - Light/dark theme toggle
 - Multi-page navigation with smooth transitions
-- Event booking system with pricing calculator
-- Art projects showcase (Bay Word, Parallel, Accumulate Dollars)
-- Membership subscription tiers
-- Partnership and hosting inquiry forms
-- Responsive design with mobile navigation
+- Membership subscription tiers (Supporter, Unlimited, Investor)
+- Partnership inquiry forms (Host, Food, Art, Team)
+- Responsive design with mobile-optimized navigation
 
 ## Tech
 
 - Vanilla JavaScript
 - WebGL shaders for liquid effects
-- CSS animations and transitions
-- Google Forms integration for bookings
+- Canvas particle system (mobile-optimized)
+- CSS animations and custom properties
+- Google Forms integration
 
 ## Pages
 
-- Home - Landing page
-- About - Menu and team
-- Subscribe - Membership tiers
-- Partner - Collaboration opportunities
-- Buttercup - Upcoming interactive art project
+- **Home** - Landing page
+- **About** - Drink menu
+- **Subscribe** - Membership tiers
+- **Partner** - Collaboration opportunities
+- **Buttercup** - Parent company (in development)
+
+## Development
+
+```bash
+python -m http.server 8000
+```
+
+Then open `http://localhost:8000`
