@@ -1608,14 +1608,21 @@ footer a:hover {
 }
 
 /* ========== LANDING PAGE ========== */
+#page-landing {
+    overflow: hidden;
+    max-height: 100vh;
+}
+
 .landing-container {
     min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
     padding-top: 80px;
+    overflow: hidden;
 }
 
 .landing-hero {
@@ -2137,17 +2144,30 @@ footer a:hover {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
+    #page-landing {
+        max-height: calc(100vh - 80px);
+    }
+
+    .landing-container {
+        height: calc(100vh - 80px);
+        min-height: calc(100vh - 80px);
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
     .landing-logo {
         font-size: 56px;
     }
 
     .landing-tagline {
         font-size: 24px;
+        margin-bottom: 25px;
     }
 
     .landing-intro {
         font-size: 16px;
         padding: 0 20px;
+        margin-bottom: 30px;
     }
 
     .landing-cta {

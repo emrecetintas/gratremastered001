@@ -1,3 +1,85 @@
+// ===== MENU CONFIG LOADER =====
+// Loads menu items from menu-config.json for easy editing
+let menuConfig = null;
+let drinkDetails = {};
+
+async function loadMenuConfig() {
+    try {
+        const response = await fetch('menu-config.json');
+        menuConfig = await response.json();
+
+        // Build drinkDetails object from config
+        menuConfig.drinks.forEach(drink => {
+            drinkDetails[drink.id] = {
+                name: drink.name,
+                desc: drink.fullDesc,
+                extras: drink.extras.map(e => `<p>${e}</p>`).join('')
+            };
+        });
+
+        // Render menu cards
+        renderMenuCards();
+
+        // Re-initialize drink card click handlers after rendering
+        initDrinkCardHandlers();
+
+        return menuConfig;
+    } catch (error) {
+        console.error('Failed to load menu config:', error);
+        return null;
+    }
+}
+
+function renderMenuCards() {
+    const drinksScroll = document.querySelector('.drinks-scroll');
+    if (!drinksScroll || !menuConfig) return;
+
+    // Clear existing cards
+    drinksScroll.innerHTML = '';
+
+    // Render each drink from config
+    menuConfig.drinks.forEach(drink => {
+        const card = document.createElement('div');
+        card.className = 'drink-card';
+        card.setAttribute('data-drink', drink.id);
+
+        const iconSvg = menuConfig.icons[drink.icon] || menuConfig.icons['surprise'];
+
+        card.innerHTML = `
+            <div class="drink-illustration">
+                ${iconSvg}
+            </div>
+            <div class="drink-info">
+                <div class="drink-name">${drink.name}</div>
+                <div class="drink-desc">${drink.shortDesc}</div>
+            </div>
+        `;
+
+        drinksScroll.appendChild(card);
+    });
+}
+
+function initDrinkCardHandlers() {
+    document.querySelectorAll('.drink-card[data-drink]').forEach(card => {
+        card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const drinkId = card.dataset.drink;
+
+            if (window.setLiquidDrink) window.setLiquidDrink(drinkId);
+            if (window.setSpiceColors) window.setSpiceColors(drinkId);
+            if (window.setLogoColor) window.setLogoColor(drinkId);
+
+            document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+
+            if (window.showDrinkDetail) window.showDrinkDetail(drinkId, card);
+        });
+    });
+}
+
+// Load menu config when DOM is ready
+document.addEventListener('DOMContentLoaded', loadMenuConfig);
+
 // Spice Dust Particle System with drink-based colors
 (function initSpiceDust() {
     const canvas = document.getElementById('spice-canvas');
@@ -887,48 +969,7 @@ function goToSlide(index) {
 }
 
 // ===== DRINK DETAIL DATA =====
-const drinkDetails = {
-    'pour-over': {
-        name: 'Pour Over',
-        desc: 'A clean, bright cup that highlights the unique characteristics of single origin beans. Hand-poured with precision, this method brings out delicate floral and fruity notes.',
-        extras: '<p>Origin: rotating seasonal selection</p><p>Brewing time: 3-4 minutes</p>'
-    },
-    'cappuccino': {
-        name: 'Cappuccino',
-        desc: 'The perfect balance of bold espresso, steamed milk, and velvety microfoam. A classic Italian preparation with a rich, creamy texture.',
-        extras: '<p>Double shot espresso</p><p>Oat milk available</p>'
-    },
-    'latte': {
-        name: 'Latte',
-        desc: 'Smooth espresso married with silky steamed milk. A gentle, approachable coffee with a delicate sweetness from the milk.',
-        extras: '<p>Add flavor: vanilla, lavender, cardamom</p><p>Extra shot available</p>'
-    },
-    'mocha': {
-        name: 'Mocha',
-        desc: 'Where coffee meets chocolate in perfect harmony. Rich espresso blended with house-made chocolate and steamed milk.',
-        extras: '<p>Dark chocolate ganache</p><p>Whipped cream optional</p>'
-    },
-    'hot-chocolate': {
-        name: 'Hot Chocolate',
-        desc: 'Decadent Belgian chocolate melted into steamed milk, topped with pillowy marshmallow clouds. Pure comfort in a cup.',
-        extras: '<p>Made with real chocolate</p><p>Vegan version available</p>'
-    },
-    'matcha-latte': {
-        name: 'Matcha Latte',
-        desc: 'Ceremonial grade matcha whisked to perfection with your choice of milk. Earthy, umami-rich, and subtly sweet.',
-        extras: '<p>Ceremonial grade from Uji, Japan</p><p>Iced option available</p>'
-    },
-    'moroccan-mint': {
-        name: 'Moroccan Mint',
-        desc: 'Fresh spearmint leaves steeped with green tea and a touch of honey. Refreshing and aromatic, a taste of Marrakech.',
-        extras: '<p>Fresh mint daily</p><p>Caffeine-free option with herbal base</p>'
-    },
-    'something-different': {
-        name: 'Surprise Me',
-        desc: 'Trust your barista to craft something special just for you. Tell us your mood, and we\'ll create a drink to match.',
-        extras: '<p>Always an adventure</p><p>Seasonal specials included</p>'
-    }
-};
+// drinkDetails is now loaded from menu-config.json (see top of file)
 
 // ===== DRINK DETAIL VIEW =====
 (function initDrinkDetailView() {
@@ -1439,13 +1480,13 @@ const defaultDrink = 'none';
         observer.observe(menuEl);
     }
 
-    // Also listen for page transitions - resize canvas when about page becomes active
-    const aboutPage = document.getElementById('page-about');
-    if (aboutPage) {
+    // Also listen for page transitions - resize canvas when menu page becomes active
+    const menuPage = document.getElementById('page-menu');
+    if (menuPage) {
         const pageObserver = new MutationObserver((mutations) => {
             mutations.forEach(mutation => {
                 if (mutation.attributeName === 'class') {
-                    if (aboutPage.classList.contains('active')) {
+                    if (menuPage.classList.contains('active')) {
                         // Small delay to ensure the page is fully visible
                         setTimeout(() => {
                             resize();
@@ -1456,37 +1497,14 @@ const defaultDrink = 'none';
                 }
             });
         });
-        pageObserver.observe(aboutPage, { attributes: true });
+        pageObserver.observe(menuPage, { attributes: true });
     }
 
     // Start animation
     startAnimation();
 
-    // Add click handlers to drink cards
-    document.querySelectorAll('.drink-card[data-drink]').forEach(card => {
-        card.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent menu section click from firing
-            const drinkId = card.dataset.drink;
-            setLiquidDrink(drinkId);
-
-            // Also change background spice colors and logo color
-            if (window.setSpiceColors) {
-                window.setSpiceColors(drinkId);
-            }
-            if (window.setLogoColor) {
-                window.setLogoColor(drinkId);
-            }
-
-            // Visual feedback - highlight selected card
-            document.querySelectorAll('.drink-card').forEach(c => c.classList.remove('selected'));
-            card.classList.add('selected');
-
-            // Show the drink detail view
-            if (window.showDrinkDetail) {
-                window.showDrinkDetail(drinkId, card);
-            }
-        });
-    });
+    // Note: Drink card click handlers are now initialized in initDrinkCardHandlers()
+    // after menu cards are dynamically loaded from menu-config.json
 })();
 
 // ========== PAGE NAVIGATION SYSTEM ==========
