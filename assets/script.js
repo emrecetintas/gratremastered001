@@ -280,13 +280,9 @@ document.addEventListener('DOMContentLoaded', loadPartnerLogos);
         isTabActive = !document.hidden;
     });
 
-    // Listen to scroll on the pages container (for scroll-snap navigation)
-    const pagesContainer = document.getElementById('main-content');
-    if (pagesContainer) {
-        pagesContainer.addEventListener('scroll', () => {
-            targetScrollY = pagesContainer.scrollTop;
-        }, { passive: true });
-    }
+    window.addEventListener('scroll', () => {
+        targetScrollY = window.scrollY;
+    }, { passive: true });
 
     function resize() {
         const oldWidth = canvas.width || window.innerWidth;
@@ -854,14 +850,17 @@ function toggleTeam() {
     arrow.classList.toggle('expanded');
 }
 
-// Scroll to Section (within the pages container)
+// Mobile Navbar - Scroll to Section
 function scrollToSection(sectionId) {
     event.preventDefault();
     const section = document.getElementById(sectionId);
-    const container = document.getElementById('main-content');
-    if (section && container) {
-        // Scroll the section into view within the container
-        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (section) {
+        const navbarHeight = 80; // Account for mobile navbar height
+        const sectionTop = section.offsetTop - 20;
+        window.scrollTo({
+            top: sectionTop,
+            behavior: 'smooth'
+        });
 
         // If scrolling to team, expand it
         if (sectionId === 'team') {
@@ -1819,12 +1818,11 @@ const defaultDrink = 'none';
     // after menu cards are dynamically loaded from menu-config.json
 })();
 
-// ========== SCROLL-SNAP PAGE NAVIGATION SYSTEM ==========
+// ========== PAGE NAVIGATION SYSTEM (Scroll-Snap Based) ==========
 (function initPageNavigation() {
-    const container = document.getElementById('main-content');
-    const pages = document.querySelectorAll('.page');
     let currentPage = 'landing';
-    let isNavigating = false; // Prevent hash updates during programmatic scroll
+    let isScrolling = false;
+    let scrollTimeout;
 
     // Get page from URL hash on load
     function getPageFromHash() {
@@ -1836,7 +1834,21 @@ const defaultDrink = 'none';
     function updateNavActiveStates(pageName) {
         // Desktop nav
         document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.toggle('active', link.dataset.page === pageName);
+            const isActive = link.dataset.page === pageName;
+            link.classList.toggle('active', isActive);
+
+            // Reset drink theme styling when switching pages
+            if (isActive) {
+                // Re-apply drink theme to active link if one is set
+                if (window.currentDrinkTheme && window.currentDrinkTheme !== 'default') {
+                    const color = window.getLogoColor ? window.getLogoColor(window.currentDrinkTheme) : '';
+                    link.style.color = color || '';
+                    link.style.borderColor = color || '';
+                }
+            } else {
+                link.style.color = '';
+                link.style.borderColor = '';
+            }
         });
 
         // Mobile nav
@@ -1845,71 +1857,60 @@ const defaultDrink = 'none';
         });
     }
 
-    // Navigate to a page by scrolling to its first snap section
+    // Navigate to a page by scrolling
     window.navigateTo = function(pageName) {
-        // Find the first snap section for this page
-        const targetSection = document.querySelector(`.snap-section[data-parent-page="${pageName}"]`);
-        if (!targetSection || !container) return;
+        const pageEl = document.getElementById(`page-${pageName}`);
+        if (!pageEl) return;
 
-        isNavigating = true;
+        // Calculate scroll position (account for nav on desktop)
+        const navHeight = window.innerWidth > 768 ? 70 : 0;
+        const pageTop = pageEl.offsetTop - navHeight;
 
-        // Update URL hash
-        window.history.pushState(null, '', `#${pageName}`);
-
-        // Scroll to the first section of the page
-        targetSection.scrollIntoView({ behavior: 'smooth' });
-
-        // Update current page and nav states
-        currentPage = pageName;
-        updateNavActiveStates(pageName);
-
-        // Update active class on pages
-        pages.forEach(page => {
-            page.classList.toggle('active', page.dataset.page === pageName);
+        // Scroll to page
+        window.scrollTo({
+            top: pageTop,
+            behavior: 'smooth'
         });
 
-        // Reset navigating flag after scroll completes
-        setTimeout(() => {
-            isNavigating = false;
-        }, 800);
+        // Update URL hash without triggering scroll
+        if (window.location.hash !== `#${pageName}`) {
+            history.pushState(null, '', `#${pageName}`);
+        }
     };
 
-    // Use IntersectionObserver to detect which section is visible
+    // Detect which page is currently in view using IntersectionObserver
+    const pages = document.querySelectorAll('.page');
+
     const observerOptions = {
-        root: container,
-        rootMargin: '-40% 0px -40% 0px', // Center detection zone
+        root: null,
+        rootMargin: '-40% 0px -40% 0px', // Trigger when page is roughly centered
         threshold: 0
     };
 
-    const sections = document.querySelectorAll('.snap-section');
-
-    const sectionObserver = new IntersectionObserver((entries) => {
+    const pageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting && !isNavigating) {
-                // Get the parent page from the section's data attribute
-                const parentPage = entry.target.dataset.parentPage;
-                if (parentPage && parentPage !== currentPage) {
-                    currentPage = parentPage;
+            if (entry.isIntersecting) {
+                const pageName = entry.target.dataset.page;
+                if (pageName && pageName !== currentPage) {
+                    currentPage = pageName;
 
-                    // Update URL hash without triggering navigation
-                    window.history.replaceState(null, '', `#${parentPage}`);
+                    // Update nav highlighting
+                    updateNavActiveStates(pageName);
 
-                    // Update nav active states
-                    updateNavActiveStates(parentPage);
-
-                    // Update active class on pages (for any CSS that might use it)
-                    pages.forEach(page => {
-                        page.classList.toggle('active', page.dataset.page === parentPage);
-                    });
+                    // Update URL hash (debounced to prevent rapid updates)
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        if (window.location.hash !== `#${pageName}`) {
+                            history.replaceState(null, '', `#${pageName}`);
+                        }
+                    }, 100);
                 }
             }
         });
     }, observerOptions);
 
-    // Observe all snap sections
-    sections.forEach(section => {
-        sectionObserver.observe(section);
-    });
+    // Observe all pages
+    pages.forEach(page => pageObserver.observe(page));
 
     // Handle nav link clicks
     document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(link => {
@@ -1925,29 +1926,27 @@ const defaultDrink = 'none';
     // Handle browser back/forward
     window.addEventListener('popstate', () => {
         const pageName = getPageFromHash();
-        if (pageName !== currentPage) {
-            navigateTo(pageName);
-        }
+        navigateTo(pageName);
     });
 
-    // Initialize on load - scroll to hash page if specified
+    // Initialize on load - scroll to page from hash
     const initialPage = getPageFromHash();
     currentPage = initialPage;
     updateNavActiveStates(initialPage);
 
-    // Mark initial page as active
-    pages.forEach(page => {
-        page.classList.toggle('active', page.dataset.page === initialPage);
-    });
-
-    // If there's a hash, scroll to that page's first section after a brief delay
+    // If there's a hash, scroll to that page after a brief delay
     if (initialPage !== 'landing') {
         setTimeout(() => {
-            const targetSection = document.querySelector(`.snap-section[data-parent-page="${initialPage}"]`);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'instant' });
-            }
+            navigateTo(initialPage);
         }, 100);
+    }
+
+    // Scroll hint click handler
+    const scrollHint = document.querySelector('.scroll-hint');
+    if (scrollHint) {
+        scrollHint.addEventListener('click', () => {
+            navigateTo('menu');
+        });
     }
 
 })();

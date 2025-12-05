@@ -48,7 +48,7 @@
 
         <!-- ========== LANDING PAGE ========== -->
         <div class="page active" id="page-landing" data-page="landing">
-            <div class="container landing-container snap-section" data-parent-page="landing">
+            <div class="container landing-container">
                 <div class="landing-hero">
                     <div class="logo landing-logo">Gratified</div>
                     <div class="tagline landing-tagline">coffee + art</div>
@@ -57,6 +57,10 @@
                         <button class="cta-btn primary" onclick="navigateTo('menu')">Explore Menu</button>
                         <button class="cta-btn secondary" onclick="navigateTo('subscribe')">Subscribe</button>
                     </div>
+                </div>
+                <div class="scroll-hint">
+                    <span class="scroll-hint-text">scroll to explore</span>
+                    <span class="scroll-hint-arrow">↓</span>
                 </div>
             </div>
         </div>
@@ -70,7 +74,7 @@
                 </div>
 
                 <div class="content">
-                    <div class="section snap-section" id="menu" data-parent-page="menu">
+                    <div class="section" id="menu">
                         <canvas id="liquid-canvas"></canvas>
 
                         <!-- Expanded drink detail view (hidden by default) -->
@@ -120,7 +124,7 @@
                 </div>
 
                 <div class="content">
-                    <div class="section snap-section" data-parent-page="subscribe">
+                    <div class="section">
                         <h2 class="section-title">Membership Tiers</h2>
                         <p class="section-intro">Support Gratified and get exclusive perks, early access, and behind-the-scenes content.</p>
 
@@ -164,7 +168,7 @@
                         </div>
                     </div>
 
-                    <div class="section snap-section" data-parent-page="subscribe">
+                    <div class="section">
                         <h2 class="section-title">What You Get</h2>
                         <div class="perks-showcase">
                             <div class="perk-item">
@@ -197,7 +201,7 @@
                 </div>
 
                 <div class="content">
-                    <div class="section snap-section" data-parent-page="partnerships">
+                    <div class="section">
                         <h2 class="section-title">Work With Us</h2>
                         <p class="section-intro">We're always looking for venues, brands, and creatives who share our vision of community through coffee and art.</p>
 
@@ -252,7 +256,7 @@
                         </div>
                     </div>
 
-                    <div class="section snap-section" data-parent-page="partnerships">
+                    <div class="section">
                         <h2 class="section-title">Past Partners</h2>
                         <p class="partners-note">We've had the pleasure of working with amazing venues and brands across the Bay Area.</p>
                         <!-- Partner logos are dynamically loaded from partners/partners.json -->
@@ -273,7 +277,7 @@
                 </div>
 
                 <div class="content">
-                    <div class="section buttercup-hero snap-section" data-parent-page="buttercup">
+                    <div class="section buttercup-hero">
                         <div class="buttercup-visual">
                             <svg viewBox="0 0 200 200" class="buttercup-flower">
                                 <defs>

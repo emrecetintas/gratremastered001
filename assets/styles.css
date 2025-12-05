@@ -148,8 +148,7 @@ body {
     line-height: 1.8;
     font-family: 'Satoshi', serif;
     font-weight: 400;
-    height: 100vh;
-    overflow: hidden; /* Scrolling happens inside .pages-container */
+    min-height: 100vh;
 }
 
 .ancient-pattern {
@@ -1632,52 +1631,44 @@ footer a:hover {
     background-color: var(--card-bg);
 }
 
-/* ========== PAGES CONTAINER & SCROLL-SNAP NAVIGATION ========== */
-.pages-container {
-    position: relative;
-    height: 100vh;
-    overflow-y: scroll;
+/* ========== PAGES CONTAINER & SCROLL SNAP ========== */
+html {
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
-    padding-top: 70px;
+    overflow-y: scroll;
 }
 
-@media (max-width: 768px) {
+body {
+    overflow-x: hidden;
+}
+
+.pages-container {
+    position: relative;
+}
+
+@media (min-width: 769px) {
     .pages-container {
-        padding-top: 0;
-        padding-bottom: 80px; /* Space for mobile navbar */
+        padding-top: 70px; /* Account for fixed nav */
     }
 }
 
 .page {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
     display: block;
     opacity: 1;
 }
 
-/* Snap section base styles - sections keep their natural size */
-.snap-section {
-    scroll-snap-align: start;
-    scroll-snap-stop: always; /* Forces stop at each section - the "bump" effect */
-}
-
-/* Legacy classes kept for compatibility - no longer used for navigation */
-.page.active {
-    /* No special styling needed - all pages visible */
-}
-
-.page.exiting {
-    /* No longer used */
-}
-
 /* ========== LANDING PAGE ========== */
 #page-landing {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    overflow: hidden;
+    height: 100vh;
 }
 
 .landing-container {
-    min-height: 100vh;
+    position: relative;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1685,6 +1676,13 @@ footer a:hover {
     text-align: center;
     padding: 60px 20px;
     box-sizing: border-box;
+}
+
+@media (min-width: 769px) {
+    .landing-container {
+        /* Account for fixed nav */
+        padding-top: 20px;
+    }
 }
 
 .landing-hero {
@@ -1717,6 +1715,55 @@ footer a:hover {
     justify-content: center;
     flex-wrap: wrap;
     animation: fadeInUp 1s ease 0.8s both;
+}
+
+.scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--olive-bronze);
+    opacity: 0.6;
+    animation: fadeInUp 1s ease 1.2s both, bounce 2s ease-in-out 2s infinite;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.scroll-hint:hover {
+    opacity: 1;
+}
+
+.scroll-hint-text {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: 'Satoshi', sans-serif;
+}
+
+.scroll-hint-arrow {
+    font-size: 20px;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateX(-50%) translateY(0);
+    }
+    40% {
+        transform: translateX(-50%) translateY(-8px);
+    }
+    60% {
+        transform: translateX(-50%) translateY(-4px);
+    }
+}
+
+@media (max-width: 768px) {
+    .scroll-hint {
+        bottom: 100px; /* Above mobile navbar */
+    }
 }
 
 .cta-btn {
