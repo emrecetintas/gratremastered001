@@ -1654,22 +1654,10 @@ footer a:hover {
     opacity: 1;
 }
 
-/* Snap section base styles */
+/* Snap section base styles - sections keep their natural size */
 .snap-section {
-    min-height: 100vh;
     scroll-snap-align: start;
     scroll-snap-stop: always; /* Forces stop at each section - the "bump" effect */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    box-sizing: border-box;
-    padding-top: 80px;
-    padding-bottom: 40px;
-}
-
-/* Remove margin from sections that are snap points */
-.section.snap-section {
-    margin-bottom: 0;
 }
 
 /* Legacy classes kept for compatibility - no longer used for navigation */
@@ -1689,9 +1677,14 @@ footer a:hover {
 }
 
 .landing-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
     text-align: center;
     padding: 60px 20px;
+    box-sizing: border-box;
 }
 
 .landing-hero {
