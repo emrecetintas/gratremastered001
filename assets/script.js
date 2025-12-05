@@ -280,9 +280,13 @@ document.addEventListener('DOMContentLoaded', loadPartnerLogos);
         isTabActive = !document.hidden;
     });
 
-    window.addEventListener('scroll', () => {
-        targetScrollY = window.scrollY;
-    }, { passive: true });
+    // Listen to scroll on the pages container (for scroll-snap navigation)
+    const pagesContainer = document.getElementById('main-content');
+    if (pagesContainer) {
+        pagesContainer.addEventListener('scroll', () => {
+            targetScrollY = pagesContainer.scrollTop;
+        }, { passive: true });
+    }
 
     function resize() {
         const oldWidth = canvas.width || window.innerWidth;
@@ -850,17 +854,14 @@ function toggleTeam() {
     arrow.classList.toggle('expanded');
 }
 
-// Mobile Navbar - Scroll to Section
+// Scroll to Section (within the pages container)
 function scrollToSection(sectionId) {
     event.preventDefault();
     const section = document.getElementById(sectionId);
-    if (section) {
-        const navbarHeight = 80; // Account for mobile navbar height
-        const sectionTop = section.offsetTop - 20;
-        window.scrollTo({
-            top: sectionTop,
-            behavior: 'smooth'
-        });
+    const container = document.getElementById('main-content');
+    if (section && container) {
+        // Scroll the section into view within the container
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // If scrolling to team, expand it
         if (sectionId === 'team') {
@@ -1818,53 +1819,18 @@ const defaultDrink = 'none';
     // after menu cards are dynamically loaded from menu-config.json
 })();
 
-// ========== PAGE NAVIGATION SYSTEM ==========
+// ========== SCROLL-SNAP PAGE NAVIGATION SYSTEM ==========
 (function initPageNavigation() {
+    const container = document.getElementById('main-content');
+    const pages = document.querySelectorAll('.page');
     let currentPage = 'landing';
-    const transitionDuration = 500; // ms
+    let isNavigating = false; // Prevent hash updates during programmatic scroll
 
     // Get page from URL hash on load
     function getPageFromHash() {
         const hash = window.location.hash.replace('#', '');
         return hash || 'landing';
     }
-
-    // Navigate to a page with smooth transition
-    window.navigateTo = function(pageName) {
-        if (pageName === currentPage) return;
-
-        const currentPageEl = document.querySelector(`.page[data-page="${currentPage}"]`);
-        const nextPageEl = document.querySelector(`.page[data-page="${pageName}"]`);
-
-        if (!nextPageEl) return;
-
-        // Start exit animation on current page
-        if (currentPageEl) {
-            currentPageEl.classList.add('exiting');
-            currentPageEl.classList.remove('active');
-        }
-
-        // Update URL hash
-        window.history.pushState(null, '', `#${pageName}`);
-
-        // After exit animation, show new page
-        setTimeout(() => {
-            if (currentPageEl) {
-                currentPageEl.classList.remove('exiting');
-            }
-
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'instant' });
-
-            // Activate new page
-            nextPageEl.classList.add('active');
-            currentPage = pageName;
-
-            // Update navigation active states
-            updateNavActiveStates(pageName);
-
-        }, transitionDuration / 2);
-    };
 
     // Update active states on nav links
     function updateNavActiveStates(pageName) {
@@ -1878,6 +1844,63 @@ const defaultDrink = 'none';
             link.classList.toggle('active', link.dataset.page === pageName);
         });
     }
+
+    // Navigate to a page by scrolling
+    window.navigateTo = function(pageName) {
+        const targetPage = document.querySelector(`.page[data-page="${pageName}"]`);
+        if (!targetPage || !container) return;
+
+        isNavigating = true;
+
+        // Update URL hash
+        window.history.pushState(null, '', `#${pageName}`);
+
+        // Scroll to the page
+        targetPage.scrollIntoView({ behavior: 'smooth' });
+
+        // Update current page and nav states
+        currentPage = pageName;
+        updateNavActiveStates(pageName);
+
+        // Reset navigating flag after scroll completes
+        setTimeout(() => {
+            isNavigating = false;
+        }, 800);
+    };
+
+    // Use IntersectionObserver to detect which page is visible
+    const observerOptions = {
+        root: container,
+        rootMargin: '0px',
+        threshold: 0.6 // Page is considered "active" when 60% visible
+    };
+
+    const pageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !isNavigating) {
+                const pageName = entry.target.dataset.page;
+                if (pageName && pageName !== currentPage) {
+                    currentPage = pageName;
+
+                    // Update URL hash without triggering navigation
+                    window.history.replaceState(null, '', `#${pageName}`);
+
+                    // Update nav active states
+                    updateNavActiveStates(pageName);
+
+                    // Update active class on pages (for any CSS that might use it)
+                    pages.forEach(page => {
+                        page.classList.toggle('active', page.dataset.page === pageName);
+                    });
+                }
+            }
+        });
+    }, observerOptions);
+
+    // Observe all pages
+    pages.forEach(page => {
+        pageObserver.observe(page);
+    });
 
     // Handle nav link clicks
     document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(link => {
@@ -1893,17 +1916,29 @@ const defaultDrink = 'none';
     // Handle browser back/forward
     window.addEventListener('popstate', () => {
         const pageName = getPageFromHash();
-        navigateTo(pageName);
+        if (pageName !== currentPage) {
+            navigateTo(pageName);
+        }
     });
 
-    // Initialize on load
+    // Initialize on load - scroll to hash page if specified
     const initialPage = getPageFromHash();
     currentPage = initialPage;
+    updateNavActiveStates(initialPage);
 
-    // Set initial active states
-    document.querySelectorAll('.page').forEach(page => {
+    // Mark initial page as active
+    pages.forEach(page => {
         page.classList.toggle('active', page.dataset.page === initialPage);
     });
-    updateNavActiveStates(initialPage);
+
+    // If there's a hash, scroll to that page after a brief delay
+    if (initialPage !== 'landing') {
+        setTimeout(() => {
+            const targetPage = document.querySelector(`.page[data-page="${initialPage}"]`);
+            if (targetPage) {
+                targetPage.scrollIntoView({ behavior: 'instant' });
+            }
+        }, 100);
+    }
 
 })();

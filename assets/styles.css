@@ -148,7 +148,8 @@ body {
     line-height: 1.8;
     font-family: 'Satoshi', serif;
     font-weight: 400;
-    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden; /* Scrolling happens inside .pages-container */
 }
 
 .ancient-pattern {
@@ -1631,50 +1632,49 @@ footer a:hover {
     background-color: var(--card-bg);
 }
 
-/* ========== PAGES CONTAINER & TRANSITIONS ========== */
+/* ========== PAGES CONTAINER & SCROLL-SNAP NAVIGATION ========== */
 .pages-container {
     position: relative;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
     padding-top: 70px;
 }
 
 @media (max-width: 768px) {
     .pages-container {
         padding-top: 0;
+        padding-bottom: 80px; /* Space for mobile navbar */
     }
 }
 
 .page {
-    display: none;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.page.active {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always; /* Forces stop at each page - the "bump" effect */
     display: block;
     opacity: 1;
-    transform: translateY(0);
+}
+
+/* Legacy classes kept for compatibility - no longer used for navigation */
+.page.active {
+    /* No special styling needed - all pages visible */
 }
 
 .page.exiting {
-    display: block;
-    opacity: 0;
-    transform: translateY(-20px);
+    /* No longer used */
 }
 
 /* ========== LANDING PAGE ========== */
-body:has(#page-landing.active) {
-    overflow: hidden;
-    height: 100vh;
-}
-
 #page-landing {
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .landing-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
