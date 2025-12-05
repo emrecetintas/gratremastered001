@@ -8,4 +8,4 @@ This folder contains previous implementations of the particle system.
 - **Effect**: Sparkly, star-like appearance
 
 ## To Restore
-Replace the particle system section in `assets/script.js` (from `// Steam/Vapor Particle System` to the closing `})();`) with the contents of the archived file.
+Replace the contents of `assets/js/particles.js` with the archived file contents.

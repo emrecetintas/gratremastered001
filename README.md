@@ -16,16 +16,16 @@ Part of **Buttercup Destiny**.
 
 ## Tech
 
-- Vanilla JavaScript
+- Vanilla JavaScript (modular structure in `assets/js/`)
 - WebGL shaders for liquid effects
-- Canvas particle system (mobile-optimized)
+- Canvas particle system
 - CSS animations and custom properties
 - Google Forms integration
 
 ## Pages
 
 - **Home** - Landing page
-- **About** - Drink menu
+- **Menu** - Drink menu with interactive detail view
 - **Subscribe** - Membership tiers
 - **Partner** - Collaboration opportunities
 - **Buttercup** - Parent company (in development)

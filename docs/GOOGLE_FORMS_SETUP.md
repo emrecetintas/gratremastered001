@@ -4,7 +4,7 @@
 
 1. Create a Google Form for each form type (Host, Food, Art, Team, Unlimited, Investor)
 2. Get the Form ID and Entry IDs
-3. Update `googleFormsConfig` in `script.js`
+3. Update `googleFormsConfig` in `assets/js/modals.js`
 
 ## Getting Form ID
 
@@ -24,7 +24,7 @@ https://docs.google.com/forms/d/e/1FAIpQLSf...ABC123.../viewform
 
 ## Field Mapping
 
-Update `script.js` around line 507:
+Update `assets/js/modals.js` around line 56:
 
 ```javascript
 'hostForm': {
