@@ -11,7 +11,29 @@
 
     // Current particle mode - can be toggled
     let particleMode = 'steam'; // 'dots', 'diamonds', 'steam', 'dust', 'grounds'
-    const PARTICLE_COUNTS = { dots: 200, diamonds: 200, steam: 120, dust: 150, grounds: 100 };
+
+    // Get particle count from config or use defaults
+    function getParticleCount(mode) {
+        if (window.particleConfig && window.particleConfig.global) {
+            return window.particleConfig.global.particleCount[mode] || 150;
+        }
+        return { dots: 200, diamonds: 200, steam: 120, dust: 150, grounds: 100 }[mode] || 150;
+    }
+
+    // Get config value with fallback
+    function getConfig(mode, key, fallback) {
+        if (window.particleConfig && window.particleConfig[mode]) {
+            return window.particleConfig[mode][key] !== undefined ? window.particleConfig[mode][key] : fallback;
+        }
+        return fallback;
+    }
+
+    function getGlobalConfig(key, fallback) {
+        if (window.particleConfig && window.particleConfig.global) {
+            return window.particleConfig.global[key] !== undefined ? window.particleConfig.global[key] : fallback;
+        }
+        return fallback;
+    }
 
     // Logo colors for each drink - theme aware for accessibility
     const drinkLogoColorsLight = {
@@ -133,12 +155,20 @@
 
     let currentColors = drinkSpiceColors['default'];
     let targetColors = drinkSpiceColors['default'];
-    const colorTransitionSpeed = 0.02;
+
+    // Color transition speed from config
+    function getColorTransitionSpeed() {
+        return getGlobalConfig('colorTransitionSpeed', 0.02);
+    }
 
     // Parallax effect based on scroll
     let scrollY = 0;
     let targetScrollY = 0;
-    const parallaxStrength = 0.15;
+
+    // Parallax strength from config
+    function getParallaxStrength() {
+        return getGlobalConfig('parallaxStrength', 0.15);
+    }
 
     // Tab visibility - reduce updates when tab is hidden
     let isTabActive = true;
@@ -188,53 +218,106 @@
         };
 
         if (particleMode === 'dots') {
-            particle.size = Math.random() * 4 + 2;
-            particle.speedX = (Math.random() - 0.5) * 0.3;
-            particle.speedY = Math.random() * 0.2 + 0.05;
-            particle.opacity = Math.random() * 0.25 + 0.08;
+            const sizeMin = getConfig('dots', 'sizeMin', 2);
+            const sizeMax = getConfig('dots', 'sizeMax', 6);
+            const speedX = getConfig('dots', 'speedX', 0.3);
+            const speedYMin = getConfig('dots', 'speedYMin', 0.05);
+            const speedYMax = getConfig('dots', 'speedYMax', 0.25);
+            const opacityMin = getConfig('dots', 'opacityMin', 0.08);
+            const opacityMax = getConfig('dots', 'opacityMax', 0.33);
+            const wobbleSpeedMax = getConfig('dots', 'wobbleSpeed', 0.02);
+
+            particle.size = Math.random() * (sizeMax - sizeMin) + sizeMin;
+            particle.speedX = (Math.random() - 0.5) * speedX;
+            particle.speedY = Math.random() * (speedYMax - speedYMin) + speedYMin;
+            particle.opacity = Math.random() * (opacityMax - opacityMin) + opacityMin;
             particle.wobble = Math.random() * Math.PI * 2;
-            particle.wobbleSpeed = Math.random() * 0.02 + 0.005;
+            particle.wobbleSpeed = Math.random() * wobbleSpeedMax + 0.005;
         } else if (particleMode === 'diamonds') {
-            particle.size = Math.random() * 4 + 2;
-            particle.speedX = (Math.random() - 0.5) * 0.3;
-            particle.speedY = Math.random() * 0.2 + 0.05;
-            particle.opacity = Math.random() * 0.25 + 0.08;
+            const sizeMin = getConfig('diamonds', 'sizeMin', 2);
+            const sizeMax = getConfig('diamonds', 'sizeMax', 6);
+            const speedX = getConfig('diamonds', 'speedX', 0.3);
+            const speedYMin = getConfig('diamonds', 'speedYMin', 0.05);
+            const speedYMax = getConfig('diamonds', 'speedYMax', 0.25);
+            const opacityMin = getConfig('diamonds', 'opacityMin', 0.08);
+            const opacityMax = getConfig('diamonds', 'opacityMax', 0.33);
+            const wobbleSpeedMax = getConfig('diamonds', 'wobbleSpeed', 0.02);
+
+            particle.size = Math.random() * (sizeMax - sizeMin) + sizeMin;
+            particle.speedX = (Math.random() - 0.5) * speedX;
+            particle.speedY = Math.random() * (speedYMax - speedYMin) + speedYMin;
+            particle.opacity = Math.random() * (opacityMax - opacityMin) + opacityMin;
             particle.wobble = Math.random() * Math.PI * 2;
-            particle.wobbleSpeed = Math.random() * 0.02 + 0.005;
+            particle.wobbleSpeed = Math.random() * wobbleSpeedMax + 0.005;
             particle.rotation = Math.random() * Math.PI * 2;
         } else if (particleMode === 'steam') {
-            particle.size = Math.random() * 6 + 3;
+            const sizeMin = getConfig('steam', 'sizeMin', 3);
+            const sizeMax = getConfig('steam', 'sizeMax', 9);
+            const speedYMin = getConfig('steam', 'speedYMin', 0.2);
+            const speedYMax = getConfig('steam', 'speedYMax', 0.6);
+            const curlSpeedMin = getConfig('steam', 'curlSpeedMin', 0.003);
+            const curlSpeedMax = getConfig('steam', 'curlSpeedMax', 0.011);
+            const curlAmpMin = getConfig('steam', 'curlAmplitudeMin', 20);
+            const curlAmpMax = getConfig('steam', 'curlAmplitudeMax', 60);
+            const maxLifeMin = getConfig('steam', 'maxLifeMin', 300);
+            const maxLifeMax = getConfig('steam', 'maxLifeMax', 700);
+
+            particle.size = Math.random() * (sizeMax - sizeMin) + sizeMin;
             particle.originalSize = particle.size;
             particle.y = canvas.height + Math.random() * 50;
-            particle.speedY = -(Math.random() * 0.4 + 0.2);
+            particle.speedY = -(Math.random() * (speedYMax - speedYMin) + speedYMin);
             particle.curlOffset = Math.random() * Math.PI * 2;
-            particle.curlSpeed = Math.random() * 0.008 + 0.003;
-            particle.curlAmplitude = Math.random() * 40 + 20;
+            particle.curlSpeed = Math.random() * (curlSpeedMax - curlSpeedMin) + curlSpeedMin;
+            particle.curlAmplitude = Math.random() * (curlAmpMax - curlAmpMin) + curlAmpMin;
             particle.life = randomizeLife ? Math.floor(Math.random() * 400) : 0;
-            particle.maxLife = Math.random() * 400 + 300;
+            particle.maxLife = Math.random() * (maxLifeMax - maxLifeMin) + maxLifeMin;
         } else if (particleMode === 'dust') {
-            particle.size = Math.random() * 3 + 1.5;
-            particle.opacity = Math.random() * 0.35 + 0.15;
-            particle.speedX = (Math.random() - 0.5) * 0.4;
-            particle.speedY = (Math.random() - 0.5) * 0.15;
+            const sizeMin = getConfig('dust', 'sizeMin', 1.5);
+            const sizeMax = getConfig('dust', 'sizeMax', 4.5);
+            const opacityMin = getConfig('dust', 'opacityMin', 0.15);
+            const opacityMax = getConfig('dust', 'opacityMax', 0.5);
+            const speedX = getConfig('dust', 'speedX', 0.4);
+            const speedY = getConfig('dust', 'speedY', 0.15);
+            const swirlSpeedMin = getConfig('dust', 'swirlSpeedMin', 0.005);
+            const swirlSpeedMax = getConfig('dust', 'swirlSpeedMax', 0.015);
+            const swirlRadiusMin = getConfig('dust', 'swirlRadiusMin', 5);
+            const swirlRadiusMax = getConfig('dust', 'swirlRadiusMax', 20);
+
+            particle.size = Math.random() * (sizeMax - sizeMin) + sizeMin;
+            particle.opacity = Math.random() * (opacityMax - opacityMin) + opacityMin;
+            particle.speedX = (Math.random() - 0.5) * speedX;
+            particle.speedY = (Math.random() - 0.5) * speedY;
             particle.swirlPhase = Math.random() * Math.PI * 2;
-            particle.swirlSpeed = Math.random() * 0.01 + 0.005;
-            particle.swirlRadius = Math.random() * 15 + 5;
+            particle.swirlSpeed = Math.random() * (swirlSpeedMax - swirlSpeedMin) + swirlSpeedMin;
+            particle.swirlRadius = Math.random() * (swirlRadiusMax - swirlRadiusMin) + swirlRadiusMin;
             particle.directionTimer = Math.floor(Math.random() * 200);
             particle.directionInterval = Math.floor(Math.random() * 300) + 200;
         } else if (particleMode === 'grounds') {
-            particle.size = Math.random() * 2.5 + 1;
-            particle.opacity = Math.random() * 0.4 + 0.2;
-            particle.speedX = (Math.random() - 0.5) * 0.08;
+            const sizeMin = getConfig('grounds', 'sizeMin', 1);
+            const sizeMax = getConfig('grounds', 'sizeMax', 3.5);
+            const opacityMin = getConfig('grounds', 'opacityMin', 0.2);
+            const opacityMax = getConfig('grounds', 'opacityMax', 0.6);
+            const speedX = getConfig('grounds', 'speedX', 0.08);
+            const speedYDown = getConfig('grounds', 'speedYDown', 0.12);
+            const speedYUp = getConfig('grounds', 'speedYUp', 0.05);
+            const wobbleSpeedMax = getConfig('grounds', 'wobbleSpeed', 0.008);
+            const wobbleAmountMax = getConfig('grounds', 'wobbleAmount', 0.3);
+            const rotationSpeedMax = getConfig('grounds', 'rotationSpeed', 0.01);
+            const stretchMin = getConfig('grounds', 'stretchMin', 0.8);
+            const stretchMax = getConfig('grounds', 'stretchMax', 1.3);
+
+            particle.size = Math.random() * (sizeMax - sizeMin) + sizeMin;
+            particle.opacity = Math.random() * (opacityMax - opacityMin) + opacityMin;
+            particle.speedX = (Math.random() - 0.5) * speedX;
             particle.speedY = Math.random() < 0.7
-                ? Math.random() * 0.12 + 0.02
-                : -(Math.random() * 0.05 + 0.01);
+                ? Math.random() * speedYDown + 0.02
+                : -(Math.random() * speedYUp + 0.01);
             particle.wobble = Math.random() * Math.PI * 2;
-            particle.wobbleSpeed = Math.random() * 0.008 + 0.002;
-            particle.wobbleAmount = Math.random() * 0.3 + 0.1;
+            particle.wobbleSpeed = Math.random() * wobbleSpeedMax + 0.002;
+            particle.wobbleAmount = Math.random() * wobbleAmountMax + 0.1;
             particle.rotation = Math.random() * Math.PI * 2;
-            particle.rotationSpeed = (Math.random() - 0.5) * 0.01;
-            particle.stretch = Math.random() * 0.5 + 0.8;
+            particle.rotationSpeed = (Math.random() - 0.5) * rotationSpeedMax;
+            particle.stretch = Math.random() * (stretchMax - stretchMin) + stretchMin;
         }
 
         return particle;
@@ -243,11 +326,16 @@
     function init() {
         resize();
         particles = [];
-        const count = PARTICLE_COUNTS[particleMode] || 150;
+        const count = getParticleCount(particleMode);
         for (let i = 0; i < count; i++) {
             particles.push(createParticle(true));
         }
     }
+
+    // Expose function to reinitialize with new config
+    window.applyParticleConfig = function() {
+        init();
+    };
 
     window.setParticleMode = function(mode) {
         if (['dots', 'diamonds', 'steam', 'dust', 'grounds'].includes(mode)) {
@@ -289,7 +377,7 @@
         scrollY += (targetScrollY - scrollY) * 0.1;
 
         particles.forEach((p) => {
-            p.color = lerpColor(p.color, p.targetColor, colorTransitionSpeed);
+            p.color = lerpColor(p.color, p.targetColor, getColorTransitionSpeed());
 
             if (particleMode === 'dots') {
                 p.wobble += p.wobbleSpeed;
@@ -305,15 +393,16 @@
                 if (p.x > canvas.width + 10) p.x = -10;
                 if (p.x < -10) p.x = canvas.width + 10;
 
-                const depthFactor = (p.size / 6) * parallaxStrength;
+                const depthFactor = (p.size / 6) * getParallaxStrength();
                 const parallaxOffsetY = scrollY * depthFactor;
+                const shadowBlur = getConfig('dots', 'shadowBlur', 2);
 
                 const colorStr = `rgba(${Math.round(p.color.r)}, ${Math.round(p.color.g)}, ${Math.round(p.color.b)}, ${p.opacity})`;
                 ctx.beginPath();
                 ctx.arc(p.x, p.y - parallaxOffsetY, p.size, 0, Math.PI * 2);
                 ctx.fillStyle = colorStr;
                 ctx.shadowColor = colorStr;
-                ctx.shadowBlur = p.size * 2;
+                ctx.shadowBlur = p.size * shadowBlur;
                 ctx.fill();
 
             } else if (particleMode === 'diamonds') {
@@ -330,22 +419,24 @@
                 if (p.x > canvas.width + 10) p.x = -10;
                 if (p.x < -10) p.x = canvas.width + 10;
 
-                const depthFactor = (p.size / 6) * parallaxStrength;
+                const depthFactor = (p.size / 6) * getParallaxStrength();
                 const parallaxOffsetY = scrollY * depthFactor;
                 const x = p.x;
                 const y = p.y - parallaxOffsetY;
                 const size = p.size * 1.5;
+                const shadowBlur = getConfig('diamonds', 'shadowBlur', 2);
+                const rotationEffect = getConfig('diamonds', 'rotationEffect', 0.1);
 
                 const colorStr = `rgba(${Math.round(p.color.r)}, ${Math.round(p.color.g)}, ${Math.round(p.color.b)}, ${p.opacity})`;
 
                 ctx.save();
                 ctx.translate(x, y);
-                ctx.rotate(Math.PI / 4 + p.wobble * 0.1);
+                ctx.rotate(Math.PI / 4 + p.wobble * rotationEffect);
                 ctx.beginPath();
                 ctx.rect(-size / 2, -size / 2, size, size);
                 ctx.fillStyle = colorStr;
                 ctx.shadowColor = colorStr;
-                ctx.shadowBlur = p.size * 2;
+                ctx.shadowBlur = p.size * shadowBlur;
                 ctx.fill();
                 ctx.restore();
 
@@ -356,16 +447,18 @@
                 p.y += p.speedY;
 
                 const lifeRatio = p.life / p.maxLife;
+                const opacityPeak = getConfig('steam', 'opacityPeak', 0.15);
+                const growthRate = getConfig('steam', 'growthRate', 0.5);
                 let opacity;
                 if (lifeRatio < 0.1) {
-                    opacity = (lifeRatio / 0.1) * 0.15;
+                    opacity = (lifeRatio / 0.1) * opacityPeak;
                 } else if (lifeRatio > 0.7) {
-                    opacity = ((1 - lifeRatio) / 0.3) * 0.15;
+                    opacity = ((1 - lifeRatio) / 0.3) * opacityPeak;
                 } else {
-                    opacity = 0.15;
+                    opacity = opacityPeak;
                 }
 
-                p.size = p.originalSize * (1 + lifeRatio * 0.5);
+                p.size = p.originalSize * (1 + lifeRatio * growthRate);
 
                 if (p.life >= p.maxLife || p.y < -50) {
                     p.x = Math.random() * canvas.width;
@@ -379,7 +472,7 @@
                     p.targetColor = { ...targetColors[p.colorIndex] };
                 }
 
-                const depthFactor = (p.originalSize / 8) * parallaxStrength;
+                const depthFactor = (p.originalSize / 8) * getParallaxStrength();
                 const parallaxOffsetY = scrollY * depthFactor;
                 const x = p.x + curlX;
                 const y = p.y - parallaxOffsetY;
@@ -426,7 +519,7 @@
                 if (p.y > canvas.height + 20) p.y = -20;
                 if (p.y < -20) p.y = canvas.height + 20;
 
-                const depthFactor = (p.size / 4) * parallaxStrength;
+                const depthFactor = (p.size / 4) * getParallaxStrength();
                 const parallaxOffsetY = scrollY * depthFactor;
 
                 const colorStr = `rgba(${Math.round(p.color.r)}, ${Math.round(p.color.g)}, ${Math.round(p.color.b)}, ${p.opacity})`;
@@ -456,7 +549,7 @@
                 if (p.x > canvas.width + 20) p.x = -20;
                 if (p.x < -20) p.x = canvas.width + 20;
 
-                const depthFactor = (p.size / 3) * parallaxStrength;
+                const depthFactor = (p.size / 3) * getParallaxStrength();
                 const parallaxOffsetY = scrollY * depthFactor;
                 const x = p.x;
                 const y = p.y - parallaxOffsetY;
