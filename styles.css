@@ -1767,12 +1767,12 @@ body:has(#page-landing.active) {
 }
 
 .subscription-card.featured {
-    border-color: var(--rich-saffron);
-    transform: scale(1.02);
+    border-color: var(--dusty-rose);
+    transform: none;
 }
 
 .subscription-card.featured::before {
-    border-color: var(--rich-saffron);
+    border-color: var(--dusty-rose);
 }
 
 .sub-badge {
