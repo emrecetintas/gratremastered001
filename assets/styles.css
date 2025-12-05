@@ -113,6 +113,37 @@ body, p, .blog-excerpt, .project-subtitle, .team-title {
     outline: none;
 }
 
+/* Focus indicators for keyboard navigation */
+.nav-link:focus,
+.mobile-nav-item:focus,
+.cta-btn:focus,
+.drink-card:focus,
+.partner-btn:focus,
+.sub-btn:focus,
+.project-card:focus,
+.team-member:focus,
+.theme-toggle:focus,
+.modal-close:focus,
+.drink-detail-back:focus {
+    outline: 2px solid var(--dusty-rose);
+    outline-offset: 2px;
+}
+
+/* Focus-visible for mouse users (hide outline on click) */
+.nav-link:focus:not(:focus-visible),
+.mobile-nav-item:focus:not(:focus-visible),
+.cta-btn:focus:not(:focus-visible),
+.drink-card:focus:not(:focus-visible),
+.partner-btn:focus:not(:focus-visible),
+.sub-btn:focus:not(:focus-visible),
+.project-card:focus:not(:focus-visible),
+.team-member:focus:not(:focus-visible),
+.theme-toggle:focus:not(:focus-visible),
+.modal-close:focus:not(:focus-visible),
+.drink-detail-back:focus:not(:focus-visible) {
+    outline: none;
+}
+
 /* Smooth theme transitions */
 body,
 .section,

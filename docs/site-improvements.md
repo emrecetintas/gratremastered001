@@ -35,21 +35,11 @@ IDs use format: `{form}-{field}` (e.g., `host-name`, `investor-email`)
   - Tablet: 11px → 12px
   - Mobile: 10px → 11px
 
-### 4. Missing Focus Indicators
-Many interactive elements (drink cards, nav items) don't have visible `:focus` styles for keyboard users.
-
-**Fix:** Add to `styles.css`:
-```css
-.nav-link:focus,
-.mobile-nav-item:focus,
-.cta-btn:focus,
-.drink-card:focus,
-.partner-btn:focus,
-.sub-btn:focus {
-    outline: 2px solid var(--dusty-rose);
-    outline-offset: 2px;
-}
-```
+### ~~4. Missing Focus Indicators~~ ✓ FIXED
+Added visible focus styles for keyboard navigation in `styles.css` (lines 116-145):
+- 2px dusty rose outline with 2px offset for all interactive elements
+- Uses `:focus-visible` to hide outline on mouse clicks while preserving keyboard accessibility
+- Covers: nav links, buttons, drink cards, project cards, team members, theme toggle, modals
 
 ### 5. Mobile Nav Icons Lack Accessible Labels
 The mobile navbar icons (lines 578-592) have no `aria-label` or visible text for screen readers.
@@ -231,7 +221,7 @@ Values like `transitionDuration = 500` and various pixel values could be CSS var
 
 - [ ] Add `<meta name="description">` tag
 - [x] Add `for` attributes to all form labels
-- [ ] Add focus styles for interactive elements
+- [x] Add focus styles for interactive elements
 - [ ] Add `aria-label` to mobile nav items
 - [ ] Add Escape key handler for modals
 - [ ] Remove or hide the particle toggle button before launch
