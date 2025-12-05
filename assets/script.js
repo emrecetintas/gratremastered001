@@ -1845,22 +1845,28 @@ const defaultDrink = 'none';
         });
     }
 
-    // Navigate to a page by scrolling
+    // Navigate to a page by scrolling to its first snap section
     window.navigateTo = function(pageName) {
-        const targetPage = document.querySelector(`.page[data-page="${pageName}"]`);
-        if (!targetPage || !container) return;
+        // Find the first snap section for this page
+        const targetSection = document.querySelector(`.snap-section[data-parent-page="${pageName}"]`);
+        if (!targetSection || !container) return;
 
         isNavigating = true;
 
         // Update URL hash
         window.history.pushState(null, '', `#${pageName}`);
 
-        // Scroll to the page
-        targetPage.scrollIntoView({ behavior: 'smooth' });
+        // Scroll to the first section of the page
+        targetSection.scrollIntoView({ behavior: 'smooth' });
 
         // Update current page and nav states
         currentPage = pageName;
         updateNavActiveStates(pageName);
+
+        // Update active class on pages
+        pages.forEach(page => {
+            page.classList.toggle('active', page.dataset.page === pageName);
+        });
 
         // Reset navigating flag after scroll completes
         setTimeout(() => {
@@ -1868,38 +1874,41 @@ const defaultDrink = 'none';
         }, 800);
     };
 
-    // Use IntersectionObserver to detect which page is visible
+    // Use IntersectionObserver to detect which section is visible
     const observerOptions = {
         root: container,
-        rootMargin: '0px',
-        threshold: 0.6 // Page is considered "active" when 60% visible
+        rootMargin: '-40% 0px -40% 0px', // Center detection zone
+        threshold: 0
     };
 
-    const pageObserver = new IntersectionObserver((entries) => {
+    const sections = document.querySelectorAll('.snap-section');
+
+    const sectionObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && !isNavigating) {
-                const pageName = entry.target.dataset.page;
-                if (pageName && pageName !== currentPage) {
-                    currentPage = pageName;
+                // Get the parent page from the section's data attribute
+                const parentPage = entry.target.dataset.parentPage;
+                if (parentPage && parentPage !== currentPage) {
+                    currentPage = parentPage;
 
                     // Update URL hash without triggering navigation
-                    window.history.replaceState(null, '', `#${pageName}`);
+                    window.history.replaceState(null, '', `#${parentPage}`);
 
                     // Update nav active states
-                    updateNavActiveStates(pageName);
+                    updateNavActiveStates(parentPage);
 
                     // Update active class on pages (for any CSS that might use it)
                     pages.forEach(page => {
-                        page.classList.toggle('active', page.dataset.page === pageName);
+                        page.classList.toggle('active', page.dataset.page === parentPage);
                     });
                 }
             }
         });
     }, observerOptions);
 
-    // Observe all pages
-    pages.forEach(page => {
-        pageObserver.observe(page);
+    // Observe all snap sections
+    sections.forEach(section => {
+        sectionObserver.observe(section);
     });
 
     // Handle nav link clicks
@@ -1931,12 +1940,12 @@ const defaultDrink = 'none';
         page.classList.toggle('active', page.dataset.page === initialPage);
     });
 
-    // If there's a hash, scroll to that page after a brief delay
+    // If there's a hash, scroll to that page's first section after a brief delay
     if (initialPage !== 'landing') {
         setTimeout(() => {
-            const targetPage = document.querySelector(`.page[data-page="${initialPage}"]`);
-            if (targetPage) {
-                targetPage.scrollIntoView({ behavior: 'instant' });
+            const targetSection = document.querySelector(`.snap-section[data-parent-page="${initialPage}"]`);
+            if (targetSection) {
+                targetSection.scrollIntoView({ behavior: 'instant' });
             }
         }, 100);
     }
