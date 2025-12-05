@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
+    <!-- Skip Navigation Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div class="muddy-flow"></div>
     <canvas id="spice-canvas"></canvas>
     <div class="grain-overlay"></div>
@@ -41,7 +44,7 @@
     </button>
 
     <!-- Page Container -->
-    <div class="pages-container" id="pagesContainer">
+    <main class="pages-container" id="main-content">
 
         <!-- ========== LANDING PAGE ========== -->
         <div class="page active" id="page-landing" data-page="landing">
@@ -299,7 +302,7 @@
             </div>
         </div>
 
-    </div>
+    </main>
 
     <!-- Host Us Modal -->
     <div class="modal-overlay" id="hostModal">
@@ -309,18 +312,18 @@
 
             <form id="hostForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="host-name">Your Name</label>
+                    <input type="text" class="form-input" id="host-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="host-email">Email</label>
+                    <input type="email" class="form-input" id="host-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Space Type</label>
-                    <select class="form-select" name="spaceType" required>
+                    <label class="form-label" for="host-spaceType">Space Type</label>
+                    <select class="form-select" id="host-spaceType" name="spaceType" required>
                         <option value="">Select type</option>
                         <option value="Coworking Space">Coworking Space</option>
                         <option value="Art Studio">Art Studio</option>
@@ -331,13 +334,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Location</label>
-                    <input type="text" class="form-input" name="location" placeholder="Address or neighborhood" required>
+                    <label class="form-label" for="host-location">Location</label>
+                    <input type="text" class="form-input" id="host-location" name="location" placeholder="Address or neighborhood" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tell us about your space</label>
-                    <textarea class="form-textarea" name="details" placeholder="Size, foot traffic, what you're looking for..."></textarea>
+                    <label class="form-label" for="host-details">Tell us about your space</label>
+                    <textarea class="form-textarea" id="host-details" name="details" placeholder="Size, foot traffic, what you're looking for..."></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn">Send Inquiry</button>
@@ -353,23 +356,23 @@
 
             <form id="foodForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="food-name">Your Name</label>
+                    <input type="text" class="form-input" id="food-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="food-email">Email</label>
+                    <input type="email" class="form-input" id="food-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Business Name</label>
-                    <input type="text" class="form-input" name="business" required>
+                    <label class="form-label" for="food-business">Business Name</label>
+                    <input type="text" class="form-input" id="food-business" name="business" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">What do you make?</label>
-                    <select class="form-select" name="foodType" required>
+                    <label class="form-label" for="food-foodType">What do you make?</label>
+                    <select class="form-select" id="food-foodType" name="foodType" required>
                         <option value="">Select type</option>
                         <option value="Bakery/Pastries">Bakery/Pastries</option>
                         <option value="Savory Snacks">Savory Snacks</option>
@@ -380,8 +383,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tell us about your products</label>
-                    <textarea class="form-textarea" name="details" placeholder="What you make, pricing, availability..."></textarea>
+                    <label class="form-label" for="food-details">Tell us about your products</label>
+                    <textarea class="form-textarea" id="food-details" name="details" placeholder="What you make, pricing, availability..."></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn">Send Inquiry</button>
@@ -397,18 +400,18 @@
 
             <form id="artForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="art-name">Your Name</label>
+                    <input type="text" class="form-input" id="art-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="art-email">Email</label>
+                    <input type="email" class="form-input" id="art-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">What kind of artist are you?</label>
-                    <select class="form-select" name="artType" required>
+                    <label class="form-label" for="art-artType">What kind of artist are you?</label>
+                    <select class="form-select" id="art-artType" name="artType" required>
                         <option value="">Select type</option>
                         <option value="Visual Artist">Visual Artist</option>
                         <option value="Photographer">Photographer</option>
@@ -420,13 +423,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Portfolio Link</label>
-                    <input type="url" class="form-input" name="portfolio" placeholder="Website or Instagram">
+                    <label class="form-label" for="art-portfolio">Portfolio Link</label>
+                    <input type="url" class="form-input" id="art-portfolio" name="portfolio" placeholder="Website or Instagram">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">What are you interested in?</label>
-                    <textarea class="form-textarea" name="details" placeholder="Gallery show, residency, collaboration idea..."></textarea>
+                    <label class="form-label" for="art-details">What are you interested in?</label>
+                    <textarea class="form-textarea" id="art-details" name="details" placeholder="Gallery show, residency, collaboration idea..."></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn">Send Inquiry</button>
@@ -442,18 +445,18 @@
 
             <form id="teamForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="team-name">Your Name</label>
+                    <input type="text" class="form-input" id="team-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="team-email">Email</label>
+                    <input type="email" class="form-input" id="team-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Role you're interested in</label>
-                    <select class="form-select" name="role" required>
+                    <label class="form-label" for="team-role">Role you're interested in</label>
+                    <select class="form-select" id="team-role" name="role" required>
                         <option value="">Select role</option>
                         <option value="Barista">Barista</option>
                         <option value="Event Coordinator">Event Coordinator</option>
@@ -464,13 +467,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Link to your work (if applicable)</label>
-                    <input type="url" class="form-input" name="portfolio" placeholder="Portfolio, LinkedIn, Instagram...">
+                    <label class="form-label" for="team-portfolio">Link to your work (if applicable)</label>
+                    <input type="url" class="form-input" id="team-portfolio" name="portfolio" placeholder="Portfolio, LinkedIn, Instagram...">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Why do you want to join Gratified?</label>
-                    <textarea class="form-textarea" name="details" placeholder="Tell us about yourself..."></textarea>
+                    <label class="form-label" for="team-details">Why do you want to join Gratified?</label>
+                    <textarea class="form-textarea" id="team-details" name="details" placeholder="Tell us about yourself..."></textarea>
                 </div>
 
                 <button type="submit" class="submit-btn">Apply</button>
@@ -486,18 +489,18 @@
 
             <form id="unlimitedForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="unlimited-name">Your Name</label>
+                    <input type="text" class="form-input" id="unlimited-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="unlimited-email">Email</label>
+                    <input type="email" class="form-input" id="unlimited-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Phone (for membership card)</label>
-                    <input type="tel" class="form-input" name="phone" placeholder="Optional">
+                    <label class="form-label" for="unlimited-phone">Phone (for membership card)</label>
+                    <input type="tel" class="form-input" id="unlimited-phone" name="phone" placeholder="Optional">
                 </div>
 
                 <div class="estimate-display" style="display: block;">
@@ -506,8 +509,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">How did you hear about us?</label>
-                    <select class="form-select" name="source">
+                    <label class="form-label" for="unlimited-source">How did you hear about us?</label>
+                    <select class="form-select" id="unlimited-source" name="source">
                         <option value="">Select one</option>
                         <option value="Instagram">Instagram</option>
                         <option value="Twitter">Twitter</option>
@@ -530,18 +533,18 @@
 
             <form id="investorForm">
                 <div class="form-group">
-                    <label class="form-label">Your Name</label>
-                    <input type="text" class="form-input" name="name" required>
+                    <label class="form-label" for="investor-name">Your Name</label>
+                    <input type="text" class="form-input" id="investor-name" name="name" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" name="email" required>
+                    <label class="form-label" for="investor-email">Email</label>
+                    <input type="email" class="form-input" id="investor-email" name="email" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" name="phone" required>
+                    <label class="form-label" for="investor-phone">Phone</label>
+                    <input type="tel" class="form-input" id="investor-phone" name="phone" required>
                 </div>
 
                 <div class="estimate-display" style="display: block;">
@@ -550,13 +553,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tell us about yourself</label>
-                    <textarea class="form-textarea" name="details" placeholder="Your background, why you're interested in Gratified..."></textarea>
+                    <label class="form-label" for="investor-details">Tell us about yourself</label>
+                    <textarea class="form-textarea" id="investor-details" name="details" placeholder="Your background, why you're interested in Gratified..."></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">LinkedIn or Website</label>
-                    <input type="url" class="form-input" name="linkedin" placeholder="Optional">
+                    <label class="form-label" for="investor-linkedin">LinkedIn or Website</label>
+                    <input type="url" class="form-input" id="investor-linkedin" name="linkedin" placeholder="Optional">
                 </div>
 
                 <button type="submit" class="submit-btn">Request Info</button>

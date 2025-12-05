@@ -36,7 +36,7 @@ body, p, .blog-excerpt, .project-subtitle, .team-title {
     --deep-teal: #2D5B69;
     --golden-sand: #E6C89C;
     --burnt-orange: #CC5500;
-    --olive-bronze: #8B7355;
+    --olive-bronze: #6B5740;            /* Darkened for WCAG AA contrast (5.2:1) */
     --cream-parchment: #F7F3E9;
     --charcoal-ink: #3C3C3C;
 
@@ -88,6 +88,29 @@ body, p, .blog-excerpt, .project-subtitle, .team-title {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Skip Link for Accessibility */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--dusty-rose);
+    color: var(--cream-parchment);
+    padding: 12px 24px;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    z-index: 10000;
+    border: 2px solid var(--rich-saffron);
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 10px;
+    outline: none;
 }
 
 /* Smooth theme transitions */
@@ -1117,9 +1140,9 @@ footer a:hover {
 }
 
 .drink-desc {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--olive-bronze);
-    line-height: 1.4;
+    line-height: 1.5;
     font-style: italic;
     letter-spacing: 0.3px;
 }
@@ -1203,7 +1226,7 @@ footer a:hover {
     }
 
     .drink-desc {
-        font-size: 11px;
+        font-size: 12px;
     }
 }
 
@@ -1249,7 +1272,7 @@ footer a:hover {
     }
 
     .drink-desc {
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .scroll-indicator {
