@@ -58,7 +58,39 @@ function renderMenuCards() {
 
         drinksScroll.appendChild(card);
     });
+
+    // Apply theme-appropriate colors to cards
+    updateCardColors();
 }
+
+// Update card colors based on current theme
+function updateCardColors() {
+    if (!window.getLogoColor) return;
+
+    document.querySelectorAll('.drink-card[data-drink]').forEach(card => {
+        const drinkId = card.dataset.drink;
+        const color = window.getLogoColor(drinkId);
+        if (color) {
+            card.style.setProperty('--drink-color', color);
+            card.style.borderColor = color;
+        }
+    });
+}
+
+// Expose function for theme toggle to call
+window.updateMenuCardColors = updateCardColors;
+
+// Listen for theme changes to update card colors
+const themeObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+            updateCardColors();
+        }
+    });
+});
+
+// Start observing theme changes on document element
+themeObserver.observe(document.documentElement, { attributes: true });
 
 function initDrinkCardHandlers() {
     document.querySelectorAll('.drink-card[data-drink]').forEach(card => {

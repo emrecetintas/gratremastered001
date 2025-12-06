@@ -361,9 +361,7 @@ body {
 
 #menu .drink-card.selected {
     background-color: var(--card-bg-hover);
-    border-color: var(--rich-saffron);
-    transform: rotate(45deg) scale(1.08);
-    box-shadow: 0 0 0 3px var(--dusty-rose), 0 8px 16px rgba(114, 47, 55, 0.2);
+    box-shadow: 0 0 0 3px var(--drink-color, var(--dusty-rose)), 0 8px 16px rgba(114, 47, 55, 0.2);
 }
 
 .section::before {
@@ -1130,7 +1128,6 @@ footer a:hover {
 
 .drink-card:hover {
     background-color: var(--card-bg-hover);
-    border-color: var(--rich-saffron);
     transform: translateY(-8px);
     box-shadow: 0 12px 30px rgba(114, 47, 55, 0.25);
 }
@@ -1142,16 +1139,15 @@ footer a:hover {
 /* Selected state */
 #menu .drink-card.selected {
     background-color: var(--card-bg-hover);
-    border-color: var(--rich-saffron);
     transform: translateY(-8px);
     box-shadow:
-        0 0 0 4px var(--dusty-rose),
+        0 0 0 4px var(--drink-color, var(--dusty-rose)),
         0 12px 30px rgba(114, 47, 55, 0.3);
+    border-width: 4px;
 }
 
 #menu .drink-card.selected::before {
     opacity: 0.6;
-    border-color: var(--rich-saffron);
 }
 
 /* Drink illustration */
@@ -1167,13 +1163,12 @@ footer a:hover {
 .drink-svg {
     width: 70px;
     height: 90px;
-    color: var(--dusty-rose);
+    color: var(--drink-color, var(--dusty-rose));
     transition: color 0.4s ease, transform 0.4s ease;
 }
 
 .drink-card:hover .drink-svg,
 #menu .drink-card.selected .drink-svg {
-    color: var(--rich-saffron);
     transform: scale(1.05);
 }
 

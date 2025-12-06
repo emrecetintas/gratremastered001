@@ -78,6 +78,11 @@
                     // Update nav highlighting
                     updateNavActiveStates(pageName);
 
+                    // Update page theme colors
+                    if (window.applyPageTheme) {
+                        window.applyPageTheme(pageName);
+                    }
+
                     // Update URL hash (debounced to prevent rapid updates)
                     clearTimeout(scrollTimeout);
                     scrollTimeout = setTimeout(() => {
