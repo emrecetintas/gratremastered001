@@ -5,6 +5,8 @@
     const detailView = document.getElementById('drinkDetailView');
     const scrollWrapper = document.getElementById('menuScrollWrapper');
     const backButton = document.getElementById('drinkDetailBack');
+    const prevButton = document.getElementById('drinkDetailPrev');
+    const nextButton = document.getElementById('drinkDetailNext');
     const detailIllustration = document.getElementById('drinkDetailIllustration');
     const detailName = document.getElementById('drinkDetailName');
     const detailDesc = document.getElementById('drinkDetailDesc');
@@ -12,10 +14,28 @@
 
     if (!detailView || !scrollWrapper || !backButton) return;
 
+    // Track current drink index for navigation
+    let currentDrinkIndex = 0;
+    let drinkCards = [];
+
+    // Update navigation button states
+    function updateNavButtons() {
+        if (prevButton) {
+            prevButton.disabled = currentDrinkIndex <= 0;
+        }
+        if (nextButton) {
+            nextButton.disabled = currentDrinkIndex >= drinkCards.length - 1;
+        }
+    }
+
     // Show detail view for a drink
     window.showDrinkDetail = function(drinkId, cardElement) {
         const details = drinkDetails[drinkId];
         if (!details) return;
+
+        // Get all drink cards and find current index
+        drinkCards = Array.from(document.querySelectorAll('.drink-card'));
+        currentDrinkIndex = drinkCards.indexOf(cardElement);
 
         // Copy the SVG from the card
         const svg = cardElement.querySelector('.drink-svg');
@@ -32,12 +52,51 @@
         scrollWrapper.classList.add('hidden');
         detailView.classList.add('active');
 
+        // Update nav button states
+        updateNavButtons();
+
         // Trigger animation after display change
         requestAnimationFrame(() => {
             detailView.style.opacity = '1';
             detailView.style.transform = 'translateY(0)';
         });
     };
+
+    // Navigate to a drink by index
+    function navigateToDrink(index) {
+        if (index < 0 || index >= drinkCards.length) return;
+
+        const card = drinkCards[index];
+        const drinkId = card.dataset.drink;
+
+        // Update selected state
+        drinkCards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+
+        // Update colors and effects
+        if (window.setLiquidDrink) setLiquidDrink(drinkId);
+        if (window.setSpiceColors) setSpiceColors(drinkId);
+        if (window.setDrinkTheme) setDrinkTheme(drinkId);
+
+        // Show the new drink detail
+        currentDrinkIndex = index;
+        const details = drinkDetails[drinkId];
+        if (!details) return;
+
+        // Copy the SVG from the card
+        const svg = card.querySelector('.drink-svg');
+        if (svg) {
+            detailIllustration.innerHTML = svg.outerHTML;
+        }
+
+        // Set the content
+        detailName.textContent = details.name;
+        detailDesc.textContent = details.desc;
+        detailExtras.innerHTML = details.extras;
+
+        // Update nav button states
+        updateNavButtons();
+    }
 
     // Hide detail view and show scroll menu
     window.hideDrinkDetail = function() {
@@ -57,6 +116,38 @@
     backButton.addEventListener('click', (e) => {
         e.stopPropagation();
         hideDrinkDetail();
+    });
+
+    // Previous button handler
+    if (prevButton) {
+        prevButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigateToDrink(currentDrinkIndex - 1);
+        });
+    }
+
+    // Next button handler
+    if (nextButton) {
+        nextButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigateToDrink(currentDrinkIndex + 1);
+        });
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (!detailView.classList.contains('active')) return;
+
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            navigateToDrink(currentDrinkIndex - 1);
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            navigateToDrink(currentDrinkIndex + 1);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            hideDrinkDetail();
+        }
     });
 })();
 

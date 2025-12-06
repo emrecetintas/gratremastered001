@@ -80,7 +80,13 @@
 
                         <!-- Expanded drink detail view (hidden by default) -->
                         <div class="drink-detail-view" id="drinkDetailView">
-                            <button class="drink-detail-back" id="drinkDetailBack">← back</button>
+                            <div class="drink-detail-nav-top">
+                                <button class="drink-detail-back" id="drinkDetailBack">← back</button>
+                                <div class="drink-detail-arrows">
+                                    <button class="drink-detail-arrow" id="drinkDetailPrev" aria-label="Previous drink">←</button>
+                                    <button class="drink-detail-arrow" id="drinkDetailNext" aria-label="Next drink">→</button>
+                                </div>
+                            </div>
                             <div class="drink-detail-content">
                                 <div class="drink-detail-illustration" id="drinkDetailIllustration"></div>
                                 <div class="drink-detail-info">
